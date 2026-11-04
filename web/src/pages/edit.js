@@ -5,7 +5,6 @@ import { page } from '../html.js';
 const CLIENT = `
 (function () {
   var token = (location.hash.match(/^#t=([A-Za-z0-9_-]+)$/) || [])[1] || '';
-  if (token) history.replaceState(null, '', '/edit');
   var $ = function (id) { return document.getElementById(id); };
   var turns = [];
   function say(who, text) {
@@ -94,6 +93,7 @@ button.btn{border:0;cursor:pointer;font:inherit;font-weight:600}button.btn:disab
 
 export function editPage() {
   const body = `${CSS}<h1>우리 가게 페이지 만들기</h1>
+<p class="lead" id="keep">이 주소를 즐겨찾기에 저장해 두면 언제든 다시 고칠 수 있어요. 잃어버리면 휴대폰 인증으로 새 주소를 받을 수 있어요.</p>
 <div id="app">
 <section class="panel"><div id="log" aria-live="polite"></div>
 <form id="chatForm"><div class="row"><input type="text" id="msg" placeholder="여기에 말씀해 주세요" maxlength="1000" autocomplete="off"><button class="btn" id="send">보내기</button></div>
