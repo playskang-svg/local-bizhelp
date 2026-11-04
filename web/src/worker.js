@@ -39,7 +39,7 @@ const ROUTES = [
   [/^\/robots\.txt$/, () => new Response(ROBOTS, { headers: { 'content-type': 'text/plain; charset=utf-8' } })],
   [/^\/sitemap\.xml$/, async (env) => {
     const rows = (await env.D1.prepare("SELECT slug, updated_at FROM landings WHERE status = 'published' ORDER BY id").all()).results;
-    const urls = rows.map((r) => `<url><loc>https://local.bizhelp.kr/p/${esc(r.slug)}</loc><lastmod>${esc(r.updated_at)}</lastmod></url>`).join('');
+    const urls = '<url><loc>https://local.bizhelp.kr/</loc></url>' + rows.map((r) => `<url><loc>https://local.bizhelp.kr/p/${esc(r.slug)}</loc><lastmod>${esc(r.updated_at)}</lastmod></url>`).join('');
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
   }],
   [/^\/$/, (env, m, src) => home(env, src)],

@@ -53,3 +53,12 @@ test('home links /start and every dong', async () => {
   assert.ok(!h.includes('곧 시작'));
   for (const d of dongs) assert.ok(h.includes(`href="/d/${d.slug}"`), d.slug);
 });
+
+test('home is indexable and in sitemap', async () => {
+  const env = setup();
+  const r = await get(env, '/');
+  assert.ok(!r.headers.get('x-robots-tag'));
+  assert.ok(!(await r.text()).includes('noindex'));
+  const t = await (await get(env, '/sitemap.xml')).text();
+  assert.ok(t.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://local.bizhelp.kr/</loc></url>'));
+});
