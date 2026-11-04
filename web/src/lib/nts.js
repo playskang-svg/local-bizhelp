@@ -2,9 +2,10 @@ export function interpretValidate(j) {
   const d = j?.data?.[0];
   if (!d || d.valid !== '01') return { ok: false, reason: 'mismatch' };
   const st = d.status?.b_stt_cd;
+  if (st === '01') return { ok: true };
   if (st === '03') return { ok: false, reason: 'closed' };
   if (st === '02') return { ok: false, reason: 'suspended' };
-  return { ok: true };
+  return { ok: false, reason: 'mismatch' };
 }
 
 export async function ntsValidate(env, { bNo, startDt, pNm, bNm = '' }) {

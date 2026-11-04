@@ -34,7 +34,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : ''}${canonical ? `<link r
 <main class="wrap">${body}</main>
 <footer><div class="wrap">지역 골목상권 생활 밀착형 연계 플랫폼 · by 비즈헬프 · <a href="/privacy">개인정보 처리방침</a></div></footer>
 </body></html>`;
-  const headers = { 'content-type': 'text/html; charset=utf-8' };
+  const headers = { 'content-type': 'text/html; charset=utf-8', 'referrer-policy': 'no-referrer' };
   if (noindex) headers['x-robots-tag'] = 'noindex';
   return new Response(html, { status, headers });
 }

@@ -10,7 +10,8 @@ export function newCode() {
 }
 
 // 호출자가 env.OTP_PEPPER를 넘긴다 (없으면 호출 전에 막는다)
-export async function hash(s, pepper = '') {
+export async function hash(s, pepper) {
+  if (!pepper) throw new Error('pepper required');
   return hex(await crypto.subtle.digest('SHA-256', enc.encode(`${pepper}:${s}`)));
 }
 
