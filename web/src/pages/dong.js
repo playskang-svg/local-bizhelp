@@ -4,9 +4,9 @@ import { getDong, publishedLandingsIn } from '../db.js';
 export const TRADES = { move: '이사', clean: '청소', install: '설치', repair: '집수리' };
 
 function cardOf(l, src) {
-  let headline = '';
-  try { headline = JSON.parse(l.content || '{}').headline || ''; } catch { /* bad content json: show name only */ }
-  return `<a class="card" style="text-decoration:none" href="${esc(withSrc(`/l/${l.slug}`, src))}"><h2>${esc(l.name)}</h2>${headline ? `<p>${esc(headline)}</p>` : ''}</a>`;
+  let c = {};
+  try { c = JSON.parse(l.content || '{}'); } catch { /* bad content json: fall back to business name */ }
+  return `<a class="card" style="text-decoration:none" href="${esc(withSrc(`/p/${l.slug}`, src))}"><h2>${esc(c.name || l.name)}</h2>${c.tagline ? `<p>${esc(c.tagline)}</p>` : ''}</a>`;
 }
 
 export async function dong(env, slug, trade, src) {

@@ -24,4 +24,5 @@ export default {
     }
     return notFound();
   },
+  async scheduled(event, env, ctx) {} // Task 7 fills it
 };
