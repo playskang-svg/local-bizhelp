@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.open-next/
+worker-dist/
+.next/
+.superpowers/
+.dev.vars
+*.tgz
