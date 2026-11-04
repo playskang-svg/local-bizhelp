@@ -1,0 +1,12 @@
+{
+  "name": "localbridge-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/",
+    "dev": "wrangler dev --persist-to ../cms/.wrangler/state"
+  },
+  "devDependencies": {
+    "wrangler": "^4.157.0"
+  }
+}

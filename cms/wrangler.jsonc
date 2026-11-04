@@ -20,6 +20,7 @@
     {
       "binding": "D1",
       "database_name": "localbridge",
+      "database_id": "00000000-0000-0000-0000-000000000000",
       "remote": true
     }
   ],
