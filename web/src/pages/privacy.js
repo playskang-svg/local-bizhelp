@@ -1,0 +1,18 @@
+import { page } from '../html.js';
+
+export const privacy = () => page({
+  title: '개인정보 처리방침 | 로컬브릿지AI_천안', desc: '로컬브릿지AI_천안의 개인정보 처리방침입니다.',
+  body: `<h1>개인정보 처리방침</h1><p class="lead">시행일 2026-11-05</p>
+<section class="panel"><h2>1. 처리자</h2><p>비즈헬프(애드블스)가 이 사이트의 개인정보를 처리합니다.</p></section>
+<section class="panel"><h2>2. 수집 항목과 목적</h2>
+<p>가게 대표: 사업자등록번호, 대표자 성명, 개업일자, 상호, 휴대폰 번호, 가게 사진, 대화로 입력한 가게 소개. 사업자 확인, 본인 확인, 소개 페이지 제작과 문의 전달에 씁니다.</p>
+<p>손님: 휴대폰 번호, 동네, 작업 내용, 희망 날짜, 연락 동의 여부, 유입 경로 값. 고른 업체에 문의를 전달하는 데 씁니다. 손님 번호는 손님이 고른 그 업체 대표에게만 전달됩니다.</p></section>
+<section class="panel"><h2>3. 보관과 파기</h2>
+<p>문의 기록은 접수 1년 뒤 파기합니다. 인증번호 기록은 5분 만료 즉시 삭제합니다. 소개 페이지는 대표가 삭제를 요청하면 삭제합니다.</p></section>
+<section class="panel"><h2>4. 처리 위탁과 제공</h2><ul>
+<li>팝빌: 문자 발송</li>
+<li>Anthropic: 가게 소개 대화 처리</li>
+<li>Cloudflare: 호스팅과 저장</li>
+<li>국세청 사업자 상태·진위확인(공공데이터포털 API): 사업자 확인</li></ul></section>
+<section class="panel"><h2>5. 개인정보 보호책임자</h2><p>박서희 이사 · cosmos0302@kakao.com</p></section>`,
+});

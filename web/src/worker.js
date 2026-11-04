@@ -1,5 +1,7 @@
-import { page, cleanSrc } from './html.js';
+import { page, cleanSrc, esc } from './html.js';
 import { home } from './pages/home.js';
+import { privacy } from './pages/privacy.js';
+
 import { dong } from './pages/dong.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
@@ -13,6 +15,8 @@ const notFound = () => page({
   title: '페이지를 찾을 수 없어요', desc: '', status: 404, noindex: true,
   body: '<h1>페이지를 찾을 수 없어요</h1><p class="lead">주소를 다시 확인해 주세요.</p><a class="btn" href="/">처음으로</a>',
 });
+
+const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/admin', '/cms-api'].map((p) => `Disallow: ${p}`), 'Sitemap: https://local.bizhelp.kr/sitemap.xml', ''].join('\n');
 
 // Route table: [regex, handler(env, match, src)]. Handler returns Response or null (-> 404). Later tasks append rows.
 const ROUTES = [
@@ -31,6 +35,13 @@ const ROUTES = [
   [/^\/api\/landing\/publish$/, (env, m, src, req) => landingPublish(req, env)],
   [/^\/api\/edit-link$/, (env, m, src, req) => editLink(req, env)],
   [/^\/media\/(landings\/\d+\/[\w-]+\.(?:jpg|png|webp))$/, (env, m) => mediaGet(env, m[1])],
+  [/^\/privacy\/?$/, () => privacy()],
+  [/^\/robots\.txt$/, () => new Response(ROBOTS, { headers: { 'content-type': 'text/plain; charset=utf-8' } })],
+  [/^\/sitemap\.xml$/, async (env) => {
+    const rows = (await env.D1.prepare("SELECT slug, updated_at FROM landings WHERE status = 'published' ORDER BY id").all()).results;
+    const urls = rows.map((r) => `<url><loc>https://local.bizhelp.kr/p/${esc(r.slug)}</loc><lastmod>${esc(r.updated_at)}</lastmod></url>`).join('');
+    return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
+  }],
   [/^\/$/, (env, m, src) => home(env, src)],
   [/^\/d\/([a-z0-9-]+)\/?$/, (env, m, src) => dong(env, m[1], null, src)],
   [/^\/d\/([a-z0-9-]+)\/([a-z]+)\/?$/, (env, m, src) => dong(env, m[1], m[2], src)],
