@@ -51,6 +51,31 @@ CREATE INDEX `landings_business_idx` ON `landings` (`business_id`);
 CREATE UNIQUE INDEX `landings_slug_idx` ON `landings` (`slug`);
 CREATE INDEX `landings_updated_at_idx` ON `landings` (`updated_at`);
 CREATE INDEX `landings_created_at_idx` ON `landings` (`created_at`);
+CREATE TABLE `inquiries` (
+  	`id` integer PRIMARY KEY NOT NULL,
+  	`landing_id` integer NOT NULL,
+  	`dong` text,
+  	`work` text,
+  	`wish_date` text,
+  	`customer_phone` text,
+  	`consent` integer DEFAULT false,
+  	`src` text,
+  	`valid` integer DEFAULT true,
+  	`invalid_reason` text,
+  	`notified_at` text,
+  	`notify_result` text,
+  	`ack_token_hash` text,
+  	`ack_at` text,
+  	`reminded_at` text,
+  	`outcome` text DEFAULT 'none',
+  	`outcome_note` text,
+  	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	FOREIGN KEY (`landing_id`) REFERENCES `landings`(`id`) ON UPDATE no action ON DELETE set null
+  );
+CREATE INDEX `inquiries_landing_idx` ON `inquiries` (`landing_id`);
+CREATE INDEX `inquiries_updated_at_idx` ON `inquiries` (`updated_at`);
+CREATE INDEX `inquiries_created_at_idx` ON `inquiries` (`created_at`);
 CREATE TABLE `call_clicks` (
   	`id` integer PRIMARY KEY NOT NULL,
   	`landing_id` integer NOT NULL,

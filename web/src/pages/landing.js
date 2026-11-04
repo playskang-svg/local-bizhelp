@@ -36,7 +36,12 @@ if(f)f.addEventListener('submit',function(e){e.preventDefault();var m=document.g
  if(!g('consent').checked){m.textContent='연락 동의에 체크해 주세요.';return}
  m.textContent='보내는 중이에요.';
  fetch('/api/inquiry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({slug:slug,dong:g('dong').value,work:g('work').value,wishDate:g('wishDate').value,phone:g('phone').value,consent:true,hp:g('hp').value,src:src})})
- .then(function(r){m.textContent=r.ok?'문의를 보냈어요. 곧 연락드릴게요.':'잠시 후 다시 시도해 주세요.'},function(){m.textContent='잠시 후 다시 시도해 주세요.'})});
+ .then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{ok:r.ok,j:j}})})
+ .then(function(x){var o=f.querySelectorAll('.lp-err');for(var i=0;i<o.length;i++)o[i].remove();
+  if(x.ok){m.textContent='문의를 보냈어요. 사장님이 곧 연락드릴 거예요.';return}
+  var t=x.j.field&&g(x.j.field),l=t&&t.closest&&t.closest('label'),msg=x.j.message||'잠시 후 다시 시도해 주세요.';
+  if(l){var p=document.createElement('p');p.className='lp-msg lp-err';p.setAttribute('role','alert');p.textContent=msg;l.insertAdjacentElement('afterend',p);m.textContent=''}
+  else m.textContent=msg},function(){m.textContent='잠시 후 다시 시도해 주세요.'})});
 })();`;
 
 // Returns an escaped HTML fragment. opts.public adds the inquiry form, fixed bottom bar and script
