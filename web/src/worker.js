@@ -4,6 +4,7 @@ import { dong } from './pages/dong.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
 import { editPage } from './pages/edit.js';
+import { publicLanding, callClick } from './pages/p.js';
 import { landingState, landingChat, landingPublish, landingPhoto, editLink, mediaGet } from './lib/landing-api.js';
 
 const notFound = () => page({
@@ -17,6 +18,8 @@ const ROUTES = [
   [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
   [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
   [/^\/edit\/?$/, () => editPage()],
+  [/^\/p\/([a-z0-9-]+)\/?$/, (env, m, src) => publicLanding(env, m[1], src)],
+  [/^\/api\/call$/, (env, m, src, req) => callClick(req, env)],
   [/^\/api\/landing\/state$/, (env, m, src, req) => landingState(req, env)],
   [/^\/api\/landing\/chat$/, (env, m, src, req) => landingChat(req, env)],
   [/^\/api\/landing\/photo$/, (env, m, src, req) => landingPhoto(req, env)],

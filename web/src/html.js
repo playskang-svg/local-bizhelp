@@ -23,12 +23,12 @@ h1{font-size:28px;line-height:1.3;margin:16px 0 8px}h2{font-size:20px;margin:0 0
 .chips a{display:inline-block;border-radius:999px;background:var(--surface);padding:6px 14px;text-decoration:none}
 footer{margin-top:48px;padding:24px 0 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--surface)}`;
 
-export function page({ title, desc, body, noindex = false, canonical, status = 200 }) {
+export function page({ title, desc, body, noindex = false, canonical, status = 200, head = '' }) {
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 ${noindex ? '<meta name="robots" content="noindex">' : ''}${canonical ? `<link rel="canonical" href="${esc(canonical)}">` : ''}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+${head}<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>${CSS}</style></head><body>
 <header><div class="wrap"><a href="/">로컬브릿지AI_천안</a></div></header>
 <main class="wrap">${body}</main>

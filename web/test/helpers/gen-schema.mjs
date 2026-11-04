@@ -8,7 +8,7 @@ const re = /sql`(CREATE (?:UNIQUE )?(?:TABLE|INDEX) [\s\S]*?)(?<!\\)`\)/g;
 const out = [];
 for (const m of up.matchAll(re)) {
   const q = m[1].replace(/\\`/g, '`').trim();
-  if (/(TABLE|INDEX) `(dongs|businesses|landings|otps)(_|`)/.test(q)) out.push(q);
+  if (/(TABLE|INDEX) `(dongs|businesses|landings|otps|call_clicks)(_|`)/.test(q)) out.push(q);
 }
 fs.writeFileSync(new URL('./schema.sql', import.meta.url), `-- copied from cms/src/migrations/${f}\n${out.join('\n')}\n`);
 console.log(out.length);

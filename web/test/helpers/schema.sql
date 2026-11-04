@@ -51,6 +51,17 @@ CREATE INDEX `landings_business_idx` ON `landings` (`business_id`);
 CREATE UNIQUE INDEX `landings_slug_idx` ON `landings` (`slug`);
 CREATE INDEX `landings_updated_at_idx` ON `landings` (`updated_at`);
 CREATE INDEX `landings_created_at_idx` ON `landings` (`created_at`);
+CREATE TABLE `call_clicks` (
+  	`id` integer PRIMARY KEY NOT NULL,
+  	`landing_id` integer NOT NULL,
+  	`src` text,
+  	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	FOREIGN KEY (`landing_id`) REFERENCES `landings`(`id`) ON UPDATE no action ON DELETE set null
+  );
+CREATE INDEX `call_clicks_landing_idx` ON `call_clicks` (`landing_id`);
+CREATE INDEX `call_clicks_updated_at_idx` ON `call_clicks` (`updated_at`);
+CREATE INDEX `call_clicks_created_at_idx` ON `call_clicks` (`created_at`);
 CREATE TABLE `otps` (
   	`id` integer PRIMARY KEY NOT NULL,
   	`phone_hash` text NOT NULL,

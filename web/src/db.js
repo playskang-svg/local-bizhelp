@@ -13,3 +13,7 @@ export async function publishedLandingsIn(env, dongSlug, trade) {
   const st = env.D1.prepare(sql);
   return (await (trade ? st.bind(dongSlug, trade) : st.bind(dongSlug)).all()).results;
 }
+
+export const publishedLandingBySlug = (env, slug) =>
+  env.D1.prepare(`SELECT l.id, l.slug, l.content, l.areas, b.name FROM landings l
+    JOIN businesses b ON b.id = l.business_id WHERE l.slug = ? AND l.status = 'published'`).bind(slug).first();
