@@ -5,6 +5,8 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   output: 'standalone',
   // Metrics view imports ../shared/metrics.mjs, which lives outside cms/.
+  // The first Actions build (next build --webpack) must confirm externalDir resolves ../shared.
+  experimental: { externalDir: true },
   turbopack: { root: path.resolve(import.meta.dirname, '..') },
   // next dev would otherwise write AGENTS.md and CLAUDE.md into the repo.
   agentRules: false,

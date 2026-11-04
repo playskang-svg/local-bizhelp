@@ -29,3 +29,14 @@ test('ISO strings, late ack, magazine src, worklog minutes per landing-week', ()
   assert.equal(m.ackDenominator, 1); assert.equal(m.ackRate24h, 0);
   assert.equal(m.minutesPerLandingWeek, 15); // 60 / 2 landings / 2 weeks
 });
+
+test('worklogs window uses date field, createdAt only as fallback', () => {
+  const week = 7 * 24 * H;
+  const m = computeMetrics({ inquiries: [], callClicks: [], landings: [{ status: 'published' }],
+    worklogs: [
+      { minutes: 10, date: '2026-11-19', createdAt: now - 10 * week }, // in window by date
+      { minutes: 100, date: '2026-09-01', createdAt: now - 1 * H },    // out by date
+      { minutes: 20, date: '', createdAt: now - 1 * H },               // fallback
+    ] }, { from: now - week, to: now, now });
+  assert.equal(m.minutesPerLandingWeek, 30);
+});

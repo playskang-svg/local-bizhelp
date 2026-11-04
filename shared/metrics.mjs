@@ -13,7 +13,7 @@ export function computeMetrics({ inquiries = [], callClicks = [], landings = [],
   }
   const published = landings.filter((l) => l.status === 'published').length
   const minutes = worklogs
-    .filter((w) => inRange(ms(w.createdAt), from, to))
+    .filter((w) => inRange(w.date ? ms(/^\d{4}-\d{2}-\d{2}$/.test(w.date) ? w.date + 'T00:00:00+09:00' : w.date) : ms(w.createdAt), from, to))
     .reduce((s, w) => s + (Number(w.minutes) || 0), 0)
   const weeks = Math.max((to - from) / WEEK, 1e-9)
   return {
