@@ -3,6 +3,8 @@ import { home } from './pages/home.js';
 import { dong } from './pages/dong.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
+import { editPage } from './pages/edit.js';
+import { landingState, landingChat, landingPublish, landingPhoto, editLink, mediaGet } from './lib/landing-api.js';
 
 const notFound = () => page({
   title: '페이지를 찾을 수 없어요', desc: '', status: 404, noindex: true,
@@ -14,6 +16,13 @@ const ROUTES = [
   [/^\/start\/?$/, (env) => start(env)],
   [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
   [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
+  [/^\/edit\/?$/, () => editPage()],
+  [/^\/api\/landing\/state$/, (env, m, src, req) => landingState(req, env)],
+  [/^\/api\/landing\/chat$/, (env, m, src, req) => landingChat(req, env)],
+  [/^\/api\/landing\/photo$/, (env, m, src, req) => landingPhoto(req, env)],
+  [/^\/api\/landing\/publish$/, (env, m, src, req) => landingPublish(req, env)],
+  [/^\/api\/edit-link$/, (env, m, src, req) => editLink(req, env)],
+  [/^\/media\/(landings\/\d+\/[\w-]+\.(?:jpg|png|webp))$/, (env, m) => mediaGet(env, m[1])],
   [/^\/$/, (env, m, src) => home(env, src)],
   [/^\/d\/([a-z0-9-]+)\/?$/, (env, m, src) => dong(env, m[1], null, src)],
   [/^\/d\/([a-z0-9-]+)\/([a-z]+)\/?$/, (env, m, src) => dong(env, m[1], m[2], src)],
