@@ -19,8 +19,9 @@
   "d1_databases": [
     {
       "binding": "D1",
-      "database_name": "localbridge"
+      "database_name": "localbridge",
+      "remote": true
     }
   ],
-  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media", "remote": true }]
 }
