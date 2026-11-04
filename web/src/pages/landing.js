@@ -30,7 +30,7 @@ if(tel)tel.addEventListener('click',function(){try{navigator.sendBeacon('/api/ca
 var sh=document.getElementById('lp-share');
 if(sh)sh.addEventListener('click',function(){var u=location.origin+location.pathname;
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){})}
- else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){sh.textContent='복사했어요'},function(){})}});
+ else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){sh.textContent='복사됨'},function(){})}});
 var f=document.getElementById('lp-form');
 if(f)f.addEventListener('submit',function(e){e.preventDefault();var m=document.getElementById('lp-msg'),g=function(n){return f.elements[n]};
  if(!g('consent').checked){m.textContent='연락 동의에 체크해 주세요.';return}
@@ -44,15 +44,18 @@ if(f)f.addEventListener('submit',function(e){e.preventDefault();var m=document.g
 // row: { name (verified business name), slug, content: object|json string, areas: array|json string }
 export function renderLanding(row, opts = {}) {
   const parse = (v, d) => { if (typeof v !== 'string') return v ?? d; try { return JSON.parse(v); } catch { return d; } };
-  const c = parse(row.content, {});
+  let c = parse(row.content, {});
+  if (!c || typeof c !== 'object' || Array.isArray(c)) c = {};
   const areas = parse(row.areas, []);
   const li = (items) => `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
   const parts = [];
-  const photos = (c.photos ?? []).filter((k) => PHOTO_RE.test(k));
+  const photos = (Array.isArray(c.photos) ? c.photos : []).filter((k) => typeof k === 'string' && PHOTO_RE.test(k));
+  const shop = row.name || c.name || '가게 이름';
+  const address = c.address || row.address;
   const digits = String(c.phone ?? '').replace(/\D/g, '');
   parts.push(`<h1>${esc(row.name || c.name || '가게 이름')}</h1>`);
   if (c.tagline) parts.push(`<p class="lead">${esc(c.tagline)}</p>`);
-  if (photos.length) parts.push(`<div class="lp-photos">${photos.map((k) => `<img src="/media/${esc(k)}" alt="" loading="lazy">`).join('')}</div>`);
+  if (photos.length) parts.push(`<div class="lp-photos">${photos.map((k, i) => `<img src="/media/${esc(k)}" alt="${esc(i ? `${shop} 사진 ${i + 1}` : shop)}" loading="${i ? 'lazy' : 'eager'}">`).join('')}</div>`);
   if (c.intro) parts.push(`<p>${esc(c.intro)}</p>`);
   if (c.services?.length) parts.push(`<h2>하는 일</h2>${li(c.services.map((x) => `<b>${esc(x.title)}</b> ${esc(x.detail)}`))}`);
   if (c.excludes?.length) parts.push(`<h2>하지 않는 일</h2>${li(c.excludes.map(esc))}`);
@@ -69,7 +72,7 @@ export function renderLanding(row, opts = {}) {
   if (!opts.public) return parts.join('');
 
   if (areas.length) {
-    parts.push(`<form class="lp-form" id="lp-form" aria-label="문의하기"><h2 style="margin:0">문의하기</h2>
+    parts.push(`<form class="lp-form" id="lp-form" method="post" action="/api/inquiry" aria-label="문의하기"><h2 style="margin:0">문의하기</h2>
 <label>동네<select name="dong" required aria-label="동네">${areas.map((a) => `<option value="${esc(a)}">${esc(DONG_NAME[a] ?? a)}</option>`).join('')}</select></label>
 <label>작업<input type="text" name="work" maxlength="100" required aria-label="작업" placeholder="예: 입주청소 24평"></label>
 <label>희망 날짜<input type="date" name="wishDate" aria-label="희망 날짜"></label>
@@ -81,7 +84,7 @@ export function renderLanding(row, opts = {}) {
   }
   const bar = [];
   if (digits) bar.push(`<a class="main" id="lp-tel" href="tel:${esc(digits)}" aria-label="전화하기">전화</a>`, `<a href="sms:${esc(digits)}" aria-label="문자 보내기">문자</a>`);
-  if (c.address) bar.push(`<a href="https://map.naver.com/p/search/${encodeURIComponent(c.address)}" rel="noopener" aria-label="길찾기">길찾기</a>`);
+  if (address) bar.push(`<a href="https://map.naver.com/p/search/${encodeURIComponent(address)}" rel="noopener" aria-label="길찾기">길찾기</a>`);
   bar.push('<button type="button" id="lp-share" aria-label="공유하기">공유</button>');
   return `<style>${CSS}</style><div class="lp" id="lp" data-slug="${esc(row.slug ?? '')}" data-src="${esc(opts.src || '')}">${parts.join('')}</div>
 <nav class="lp-bar" aria-label="연락">${bar.join('')}</nav><script>${SCRIPT}</script>`;

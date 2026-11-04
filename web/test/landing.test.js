@@ -50,3 +50,30 @@ test('/api/call inserts for published only, 204 always', async () => {
   assert.equal(clicks(dr.D1).length, 0);
   assert.equal((await call(pub, 'garbage')).status, 204);
 });
+
+test('길찾기 from business address; hidden without', async () => {
+  const a = await setup('published', { tagline: 'x', phone: '01012345678' });
+  a.D1.db.exec("UPDATE businesses SET address='천안시 동남구 1'");
+  assert.ok((await (await get(a, '/p/s1')).text()).includes('map.naver.com/p/search/' + encodeURIComponent('천안시 동남구 1')));
+  const b = await setup('published', { tagline: 'x', phone: '01012345678' });
+  assert.ok(!(await (await get(b, '/p/s1')).text()).includes('길찾기'));
+});
+test('form posts, never GET', async () => {
+  assert.match(await (await get(await setup('published'), '/p/s1')).text(), /<form[^>]*method="post"/);
+});
+test('bad stored content does not 500', async () => {
+  for (const c of ['{"photos":"x"}', 'null']) {
+    const env = await setup('published');
+    env.D1.db.prepare('UPDATE landings SET content=?').run(c);
+    assert.equal((await get(env, '/p/s1')).status, 200);
+  }
+});
+test('public page escapes name; non-https channel dropped; call 204 any method', async () => {
+  const env = await setup('published', { tagline: 'x', channels: { blog: 'http://a.example', kakao: 'https://k.example' } });
+  env.D1.db.exec(`UPDATE businesses SET name='a"b<i>'`);
+  const h = await (await get(env, '/p/s1')).text();
+  assert.ok(!h.includes('a"b<i>') && h.includes('a&quot;b&lt;i&gt;'));
+  assert.match(h, /og:title" content="a&quot;b&lt;i&gt;"/);
+  assert.ok(!h.includes('http://a.example') && h.includes('https://k.example'));
+  assert.equal((await worker.fetch(new Request('https://x/api/call'), env)).status, 204);
+});

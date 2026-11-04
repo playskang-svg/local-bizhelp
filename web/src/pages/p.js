@@ -9,10 +9,11 @@ export async function publicLanding(env, slug, src) {
   const row = await publishedLandingBySlug(env, slug);
   if (!row) return null;
   let c = {};
-  try { c = JSON.parse(row.content || '{}'); } catch { /* bad content json: render name only */ }
+  try { c = JSON.parse(row.content || '{}') ?? {}; } catch { /* bad content json: render name only */ }
+  if (typeof c !== 'object' || Array.isArray(c)) c = {};
   const name = row.name || c.name || '가게';
   const desc = c.tagline || c.intro || `${name} 소개예요.`;
-  const photo = (c.photos ?? []).find((k) => PHOTO_RE.test(k));
+  const photo = (Array.isArray(c.photos) ? c.photos : []).find((k) => typeof k === 'string' && PHOTO_RE.test(k));
   const url = `${ORIGIN}/p/${row.slug}`;
   const head = `<meta property="og:type" content="website"><meta property="og:title" content="${esc(name)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(url)}">${photo ? `<meta property="og:image" content="${esc(`${ORIGIN}/media/${photo}`)}">` : ''}\n`;
   return page({ title: `${name} | 로컬브릿지AI_천안`, desc, canonical: url, head, body: renderLanding(row, { public: true, src: normalizeSrc(src) }) });
@@ -21,7 +22,7 @@ export async function publicLanding(env, slug, src) {
 // Always 204: never slows or blocks the call; records only for published landings, rate-limited per IP.
 export async function callClick(req, env) {
   const none = new Response(null, { status: 204 });
-  if (req.method !== 'POST') return new Response(null, { status: 405 });
+  if (req.method !== 'POST') return none;
   try {
     if (env.LIMIT && !(await env.LIMIT.limit({ key: `c:${req.headers.get('cf-connecting-ip') || 'local'}` })).success) return none;
     const b = await req.json().catch(() => null);
