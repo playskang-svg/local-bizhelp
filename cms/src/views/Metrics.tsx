@@ -29,12 +29,16 @@ export default async function Metrics({ initPageResult }: AdminViewServerProps) 
   const pct = (r: number | null) => (r == null ? '—' : `${Math.round(r * 100)}%`)
   const min = (n: number) => `${Math.round(n * 10) / 10}분`
   const ok = (b: boolean) => (b ? '달성' : '진행 중')
+  const published = landings.filter((l) => l.status === 'published').length
+  // display only: SMS that never reached the owner in this window (computeMetrics keys stay as they are)
+  const smsFailed = inquiries.filter((q) => ['failed', 'failed-final', 'config-missing'].includes(q.notifyResult)
+    && Date.parse(q.createdAt) >= from && Date.parse(q.createdAt) <= to).length
   const rows: [string, string, string, string][] = [
     ['유효 문의', `${total.validInquiries}건`, `${TARGETS.valid}건 이상`, ok(total.validInquiries >= TARGETS.valid)],
     ['지역 페이지 경유 문의', `${total.regionLinked}건`, `${TARGETS.region}건 이상`, ok(total.regionLinked >= TARGETS.region)],
     ['24시간 내 응답률', `${pct(total.ackRate24h)} (대상 ${total.ackDenominator}건)`, '80% 이상', ok((total.ackRate24h ?? 0) >= TARGETS.ack)],
     ['유료 전환', `${total.paid}곳`, `${TARGETS.paid}곳 이상`, ok(total.paid >= TARGETS.paid)],
-    ['업체당 관리시간(주)', min(total.minutesPerLandingWeek), `${TARGETS.minutes}분 이내`, ok(total.minutesPerLandingWeek <= TARGETS.minutes)],
+    ['업체당 관리시간(주)', min(total.minutesPerLandingWeek), `${TARGETS.minutes}분 이내`, published ? ok(total.minutesPerLandingWeek <= TARGETS.minutes) : '—'],
   ]
 
   const byLanding = landings.map((l) => {
@@ -61,6 +65,7 @@ export default async function Metrics({ initPageResult }: AdminViewServerProps) 
         <tbody>{rows.map((r) => <tr key={r[0]}>{r.map((c, i) => <td key={i} style={cell}>{c}</td>)}</tr>)}</tbody>
       </table>
       <p>전화 클릭 {total.callClicks}회 (목표 없이 참고만 해요.)</p>
+      <p>문자 전달 실패 {smsFailed}건</p>
       <h2>랜딩별</h2>
       <table style={{ borderCollapse: 'collapse' }}>
         <thead><tr>{['랜딩', '유효 문의', '지역 경유', '24시간 응답률', '전화 클릭', '관리시간(주)'].map((h) => <th key={h} style={cell}>{h}</th>)}</tr></thead>

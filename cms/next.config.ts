@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
   // Metrics view imports ../shared/metrics.mjs, which lives outside cms/.
   // The first Actions build (next build --webpack) must confirm externalDir resolves ../shared.
   experimental: { externalDir: true },
-  turbopack: { root: path.resolve(import.meta.dirname, '..') },
+  // Dev only (Turbopack must see ../shared). In next build, Next copies turbopack.root into
+  // outputFileTracingRoot, so standalone output would land in .next/standalone/cms/ and OpenNext fails.
+  ...(process.env.NODE_ENV === 'development' && { turbopack: { root: path.resolve(import.meta.dirname, '..') } }),
   // next dev would otherwise write AGENTS.md and CLAUDE.md into the repo.
   agentRules: false,
   outputFileTracingExcludes: { '*': ['**/sharp/**', '**/@img/**'] },
