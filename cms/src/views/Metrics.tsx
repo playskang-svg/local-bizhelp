@@ -2,7 +2,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import type { AdminViewServerProps } from 'payload'
 
-import { computeMetrics } from '../../../shared/metrics.mjs'
+import { computeMetrics, kstStart } from '../../../shared/metrics.mjs'
 
 const DAY = 24 * 3600e3
 const TARGETS = { valid: 10, region: 5, ack: 0.8, paid: 3, minutes: 30 }
@@ -13,7 +13,7 @@ export default async function Metrics({ initPageResult }: AdminViewServerProps) 
   const { payload } = req
 
   const now = Date.now()
-  const startEnv = Date.parse(process.env.TRACK_A_START ?? '')
+  const startEnv = kstStart(process.env.TRACK_A_START) ?? NaN
   const startMissing = Number.isNaN(startEnv)
   const from = startMissing ? now - 56 * DAY : startEnv
   const to = now
@@ -40,10 +40,10 @@ export default async function Metrics({ initPageResult }: AdminViewServerProps) 
   const byLanding = landings.map((l) => {
     const id = l.id
     const m = computeMetrics({
-      inquiries: inquiries.filter((q) => q.landing === id),
-      callClicks: callClicks.filter((c) => c.landing === id),
+      inquiries: inquiries.filter((q) => String(q.landing) === String(id)),
+      callClicks: callClicks.filter((c) => String(c.landing) === String(id)),
       landings: [l],
-      worklogs: worklogs.filter((w) => w.landing === id),
+      worklogs: worklogs.filter((w) => String(w.landing) === String(id)),
     }, range)
     return { slug: l.slug as string, m }
   })
@@ -53,7 +53,7 @@ export default async function Metrics({ initPageResult }: AdminViewServerProps) 
     <div style={{ padding: 'var(--base)' }}>
       <h1>8주 지표</h1>
       <p>
-        {new Date(from).toLocaleDateString('ko-KR')} ~ {new Date(to).toLocaleDateString('ko-KR')} 기준이에요.
+        {new Date(from).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })} ~ {new Date(to).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })} 기준이에요.
       </p>
       {startMissing && <p style={{ color: 'var(--theme-error-500)' }}>8주 시작일(TRACK_A_START)을 설정해 주세요.</p>}
       <table style={{ borderCollapse: 'collapse' }}>
