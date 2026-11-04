@@ -5,7 +5,7 @@ import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
 import { editPage } from './pages/edit.js';
 import { publicLanding, callClick } from './pages/p.js';
-import { submitInquiry, runCron } from './lib/inquiry.js';
+import { submitInquiry, runCron, ackPost } from './lib/inquiry.js';
 import { ackPage } from './pages/ack.js';
 import { landingState, landingChat, landingPublish, landingPhoto, editLink, mediaGet } from './lib/landing-api.js';
 
@@ -23,6 +23,7 @@ const ROUTES = [
   [/^\/p\/([a-z0-9-]+)\/?$/, (env, m, src) => publicLanding(env, m[1], src)],
   [/^\/api\/call$/, (env, m, src, req) => callClick(req, env)],
   [/^\/api\/inquiry$/, (env, m, src, req) => submitInquiry(req, env)],
+  [/^\/api\/ack$/, (env, m, src, req) => ackPost(req, env)],
   [/^\/ack\/([A-Za-z0-9_-]{1,64})\/?$/, (env, m) => ackPage(env, m[1])],
   [/^\/api\/landing\/state$/, (env, m, src, req) => landingState(req, env)],
   [/^\/api\/landing\/chat$/, (env, m, src, req) => landingChat(req, env)],

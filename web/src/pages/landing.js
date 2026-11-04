@@ -32,16 +32,17 @@ if(sh)sh.addEventListener('click',function(){var u=location.origin+location.path
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){})}
  else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){sh.textContent='복사됨'},function(){})}});
 var f=document.getElementById('lp-form');
-if(f)f.addEventListener('submit',function(e){e.preventDefault();var m=document.getElementById('lp-msg'),g=function(n){return f.elements[n]};
- if(!g('consent').checked){m.textContent='연락 동의에 체크해 주세요.';return}
- m.textContent='보내는 중이에요.';
+if(f)f.addEventListener('submit',function(e){e.preventDefault();var m=document.getElementById('lp-msg'),g=function(n){return f.elements[n]},b=f.querySelector('button[type=submit]');
+ var o=f.querySelectorAll('.lp-err');for(var i=0;i<o.length;i++)o[i].remove();
+ function show(n,msg){var t=g(n),l=t&&t.closest&&t.closest('label');if(l){var p=document.createElement('p');p.className='lp-msg lp-err';p.setAttribute('role','alert');p.textContent=msg;l.insertAdjacentElement('afterend',p);m.textContent=''}else m.textContent=msg}
+ if(!g('consent').checked){show('consent','연락 동의에 체크해 주세요.');return}
+ if(b.disabled)return;b.disabled=true;m.textContent='보내는 중이에요.';
  fetch('/api/inquiry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({slug:slug,dong:g('dong').value,work:g('work').value,wishDate:g('wishDate').value,phone:g('phone').value,consent:true,hp:g('hp').value,src:src})})
  .then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{ok:r.ok,j:j}})})
- .then(function(x){var o=f.querySelectorAll('.lp-err');for(var i=0;i<o.length;i++)o[i].remove();
+ .then(function(x){
   if(x.ok){m.textContent='문의를 보냈어요. 사장님이 곧 연락드릴 거예요.';return}
-  var t=x.j.field&&g(x.j.field),l=t&&t.closest&&t.closest('label'),msg=x.j.message||'잠시 후 다시 시도해 주세요.';
-  if(l){var p=document.createElement('p');p.className='lp-msg lp-err';p.setAttribute('role','alert');p.textContent=msg;l.insertAdjacentElement('afterend',p);m.textContent=''}
-  else m.textContent=msg},function(){m.textContent='잠시 후 다시 시도해 주세요.'})});
+  b.disabled=false;
+  if(x.j.field)show(x.j.field,x.j.message||'다시 확인해 주세요.');else m.textContent=x.j.message||'잠시 후 다시 시도해 주세요.'},function(){b.disabled=false;m.textContent='잠시 후 다시 시도해 주세요.'})});
 })();`;
 
 // Returns an escaped HTML fragment. opts.public adds the inquiry form, fixed bottom bar and script

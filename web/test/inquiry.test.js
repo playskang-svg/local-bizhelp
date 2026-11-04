@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeD1 } from './helpers/d1.js';
-import { validateInquiry, isDuplicate, needsReminder, submitInquiry, runCron } from '../src/lib/inquiry.js';
+import { validateInquiry, isDuplicate, needsReminder, submitInquiry, runCron, ackPost } from '../src/lib/inquiry.js';
 import { ackPage } from '../src/pages/ack.js';
 import worker from '../src/worker.js';
 
@@ -92,46 +92,114 @@ test('duplicate stored invalid, no SMS, same success', async () => {
   assert.equal(sent.length, 1);
 });
 
-test('ack sets ack_at once and page has no personal data', async () => {
+const ackReq = (token) => new Request('http://x/api/ack', { method: 'POST', body: JSON.stringify({ token }) });
+const tokOf = (sent, i = 0) => sent[i].text.match(/ack\/([\w-]+)$/)[1];
+
+test('GET ack never writes; POST /api/ack sets ack_at once', async () => {
   const { post, rows, sent, env } = setup();
   await post({});
-  const tok = sent[0].text.match(/ack\/([\w-]+)$/)[1];
+  const tok = tokOf(sent);
   const r1 = await ackPage(env, tok);
   assert.equal(r1.status, 200);
   assert.match(r1.headers.get('cache-control'), /no-store/);
   const html = await r1.text();
   assert.match(html, /기록했어요\. 손님께 연락해 주셔서 고마워요\./);
-  assert.match(html, /noindex/); assert.doesNotMatch(html, /01099990000/);
+  assert.match(html, /noindex/); assert.match(html, /\/api\/ack/); assert.doesNotMatch(html, /01099990000/);
+  assert.equal(rows()[0].ack_at, null);
+  assert.equal((await ackPost(ackReq(tok), env)).status, 200);
   const first = rows()[0].ack_at;
   assert.ok(first);
   await new Promise((r) => setTimeout(r, 5));
-  assert.equal((await ackPage(env, tok)).status, 200);
+  assert.equal((await ackPost(ackReq(tok), env)).status, 200);
   assert.equal(rows()[0].ack_at, first);
+  assert.equal((await ackPost(ackReq('wrongtoken'), env)).status, 404);
   assert.equal(await ackPage(env, 'wrongtoken'), null);
 });
 
-test('scheduled: one reminder for old un-acked, deletes expired otps', async () => {
-  const { post, rows, sent, D1, env, deps } = setup();
-  await post({});
-  await post({ phone: '010-1111-2222' });
-  await post({ phone: '010-3333-4444' });
-  await post({ phone: '010-5555-1111' });
-  const old = new Date(Date.now() - 13 * 3600e3).toISOString();
-  D1.db.exec(`UPDATE inquiries SET created_at='${old}' WHERE id IN (1,2,3)`);
-  const tok2 = null; void tok2;
-  const tok3 = sent[2].text.match(/ack\/([\w-]+)$/)[1];
-  await ackPage(env, tok3); // inquiry 3 acked
-  D1.db.exec("UPDATE inquiries SET valid=0 WHERE id=2");
-  const n = Date.now();
-  D1.db.exec(`INSERT INTO otps (phone_hash, code_hash, purpose, payload, expires_at, attempts) VALUES ('a','b','claim','{}',${n - 1000},0),('c','d','claim','{}',${n + 100000},0)`);
+const NOON = Date.parse('2026-11-05T12:00:00+09:00');
+async function seedReminders(h) {
+  const { post, sent, D1 } = h;
+  for (const p of ['010-9999-0000', '010-1111-2222', '010-3333-4444', '010-5555-1111']) await post({ phone: p });
+  const old = new Date(NOON - 13 * 3600e3).toISOString();
+  D1.db.exec(`UPDATE inquiries SET created_at='${old}' WHERE id IN (1,2,3); UPDATE inquiries SET created_at='${new Date(NOON).toISOString()}' WHERE id=4`);
+  return sent.map((x) => ({ ...x }));
+}
+
+test('scheduled: one reminder for old un-acked, same text, deletes expired otps', async () => {
+  const h = setup();
+  const { rows, sent, D1, env, deps } = h;
+  const first = await seedReminders(h);
+  await ackPost(ackReq(tokOf(sent, 2)), env); // inquiry 3 acked
+  D1.db.exec('UPDATE inquiries SET valid=0 WHERE id=2');
+  D1.db.exec(`INSERT INTO otps (phone_hash, code_hash, purpose, payload, expires_at, attempts) VALUES ('a','b','claim','{}',${NOON - 1000},0),('c','d','claim','{}',${NOON + 100000},0)`);
   sent.length = 0;
-  await runCron(env, deps, n);
+  await runCron(env, deps, NOON);
   assert.equal(sent.length, 1);
-  assert.match(sent[0].text, /01099990000/);
+  assert.deepEqual(sent[0], first[0]);
   assert.ok(rows()[0].reminded_at);
   assert.equal(D1.db.prepare('SELECT count(*) c FROM otps').get().c, 1);
-  await runCron(env, deps, n + 1000);
+  await runCron(env, deps, NOON + 1000);
   assert.equal(sent.length, 1);
+});
+
+test('reminders skip failed and config-missing rows, unpublished landings; quiet hours wait; max 20', async () => {
+  const h = setup();
+  const { sent, D1, env, deps } = h;
+  await seedReminders(h);
+  D1.db.exec("UPDATE inquiries SET notify_result='failed' WHERE id=1; UPDATE inquiries SET notify_result='config-missing' WHERE id=2; UPDATE inquiries SET notify_result='capped' WHERE id=3");
+  sent.length = 0;
+  await runCron(env, deps, NOON);
+  assert.equal(sent.length, 0);
+  D1.db.exec("UPDATE inquiries SET notify_result='sent' WHERE id=1");
+  const night = Date.parse('2026-11-05T22:00:00+09:00');
+  await runCron(env, deps, night);
+  assert.equal(sent.length, 0);
+  await runCron(env, deps, Date.parse('2026-11-06T07:59:00+09:00'));
+  assert.equal(sent.length, 0);
+  D1.db.exec("UPDATE landings SET status='draft' WHERE id=1");
+  await runCron(env, deps, Date.parse('2026-11-06T08:00:00+09:00'));
+  assert.equal(sent.length, 0);
+  D1.db.exec("UPDATE landings SET status='published' WHERE id=1");
+  await runCron(env, deps, Date.parse('2026-11-06T08:00:00+09:00'));
+  assert.equal(sent.length, 2); // ids 1 and 4
+  const many = Array.from({ length: 25 }, (_, i) => `(1,'dongnam-mokcheon-eup','x','0100000${String(i).padStart(4, '0')}',1,1,'sent','2026-11-01T00:00:00.000Z')`).join(',');
+  D1.db.exec(`INSERT INTO inquiries (landing_id, dong, work, customer_phone, consent, valid, notify_result, created_at) VALUES ${many}`);
+  sent.length = 0;
+  await runCron(env, deps, Date.parse('2026-11-06T12:00:00+09:00'));
+  assert.equal(sent.length, 20);
+});
+
+test('honeypot returns 200 and stores nothing; rate limit gives 429', async () => {
+  const { post, rows, env, deps } = setup();
+  assert.equal((await post({ hp: 'bot' })).status, 200);
+  assert.equal(rows().length, 0);
+  env.LIMIT = { limit: async () => ({ success: false }) };
+  const r = await submitInquiry(new Request('http://x/', { method: 'POST', body: '{}' }), env, deps);
+  assert.equal(r.status, 429);
+});
+
+test('landing daily cap: 21st inquiry is capped, no SMS, success', async () => {
+  const { post, rows, sent, D1 } = setup();
+  const many = Array.from({ length: 20 }, (_, i) => `(1,'dongnam-mokcheon-eup','x','0100000${String(i).padStart(4, '0')}',1,1,'sent')`).join(',');
+  D1.db.exec(`INSERT INTO inquiries (landing_id, dong, work, customer_phone, consent, valid, notify_result) VALUES ${many}`);
+  const r = await post({});
+  assert.equal(r.status, 200);
+  assert.equal(rows().at(-1).notify_result, 'capped');
+  assert.equal(sent.length, 0);
+});
+
+test('global daily cap from SMS_DAILY_CAP', async () => {
+  const { post, rows, sent } = setup({ SMS_DAILY_CAP: '2' });
+  await post({ phone: '010-1000-0001' }); await post({ phone: '010-1000-0002' });
+  assert.equal((await post({ phone: '010-1000-0003' })).status, 200);
+  assert.deepEqual(rows().map((r) => r.notify_result), ['sent', 'sent', 'capped']);
+  assert.equal(sent.length, 2);
+});
+
+test('phone rule: 010 needs 8 digits, 011 style 7-8', () => {
+  assert.equal(validateInquiry({ ...base, phone: '0101234567' }, landing, now).field, 'phone');
+  assert.equal(validateInquiry({ ...base, phone: '01712345678' }, landing, now).ok, true);
+  assert.equal(validateInquiry({ ...base, phone: '01212345678' }, landing, now).field, 'phone');
 });
 
 test('worker.scheduled runs the cron', async () => {

@@ -6,6 +6,7 @@ const DAY = 86_400_000;
 const REMIND_AFTER_MS = 12 * 3600_000;
 const ORIGIN = 'https://local.bizhelp.kr';
 const NEED = ['POPBILL_LINK_ID', 'POPBILL_SECRET_KEY', 'POPBILL_CORP_NUM', 'POPBILL_SENDER', 'OTP_PEPPER'];
+const LANDING_DAILY_CAP = 20;
 const SUBJECT = '[로컬브릿지AI_천안] 새 문의';
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
@@ -32,7 +33,7 @@ export function validateInquiry(input, landing, now) {
     if (wishDate > kstDate(now + 180 * DAY)) return no('wishDate', '180일 안의 날짜를 골라 주세요.');
   }
   const phone = String(b.phone ?? '').replace(/\D/g, '');
-  if (!/^01\d{8,9}$/.test(phone)) return no('phone', '휴대폰 번호를 다시 확인해 주세요.');
+  if (!/^010\d{8}$|^01[16789]\d{7,8}$/.test(phone)) return no('phone', '휴대폰 번호를 다시 확인해 주세요.');
   if (b.consent !== true) return no('consent', '연락 동의에 체크해 주세요.');
   return { ok: true, value: { dong, work, wishDate: wishDate || null, phone, src: normalizeSrc(b.src) } };
 }
@@ -82,7 +83,11 @@ export async function submitInquiry(req, env, deps = { sendLMS }) {
 
   const id = ins.meta.last_row_id;
   let result = 'sent';
+  const dayStart = iso(Date.parse(`${kstDate(now)}T00:00:00+09:00`));
+  const count = async (sql, ...a) => (await env.D1.prepare(sql).bind(...a).first()).c;
   if (NEED.some((k) => !env[k])) result = 'config-missing';
+  else if (await count("SELECT count(*) c FROM inquiries WHERE landing_id = ? AND notify_result IN ('sent','capped') AND created_at >= ?", landing.id, dayStart) >= LANDING_DAILY_CAP
+    || await count("SELECT count(*) c FROM inquiries WHERE notify_result = 'sent' AND created_at >= ?", dayStart) >= (Number(env.SMS_DAILY_CAP) || 300)) result = 'capped';
   else {
     try {
       await env.D1.prepare('UPDATE inquiries SET ack_token_hash = ? WHERE id = ?').bind(await tokenHash(await ackToken(env, id)), id).run();
@@ -92,6 +97,19 @@ export async function submitInquiry(req, env, deps = { sendLMS }) {
   }
   await env.D1.prepare('UPDATE inquiries SET notified_at = ?, notify_result = ? WHERE id = ?').bind(iso(Date.now()), result, id).run();
   return json({ ok: true });
+}
+
+export const ackExists = async (env, token) =>
+  !!(await env.D1.prepare('SELECT id FROM inquiries WHERE ack_token_hash = ?').bind(await tokenHash(token)).first());
+
+// POST /api/ack: JSON { token } from the page script, or a urlencoded form from the noscript button
+export async function ackPost(req, env) {
+  if (req.method !== 'POST') return json({ ok: false }, 405);
+  const form = (req.headers.get('content-type') || '').includes('form');
+  const b = form ? Object.fromEntries(await req.formData().catch(() => [])) : await req.json().catch(() => null);
+  const token = typeof b?.token === 'string' ? b.token.slice(0, 64) : '';
+  if (!token || !(await ackInquiry(env, token))) return json({ ok: false }, 404);
+  return form ? new Response(null, { status: 303, headers: { location: `/ack/${token}`, 'cache-control': 'no-store' } }) : json({ ok: true });
 }
 
 export async function ackInquiry(env, token) {
@@ -104,10 +122,12 @@ export async function ackInquiry(env, token) {
 export async function runCron(env, deps = { sendLMS }, now = Date.now()) {
   await env.D1.prepare('DELETE FROM otps WHERE expires_at < ?').bind(now).run();
   if (NEED.some((k) => !env[k])) return;
+  const hour = new Date(now + 9 * 3600_000).getUTCHours();
+  if (hour >= 21 || hour < 8) return; // quiet hours KST, picked up by the first run after 08:00
   const rows = (await env.D1.prepare(`SELECT i.id, i.dong, i.work, i.wish_date AS wishDate, i.customer_phone AS phone, i.created_at AS createdAt,
       i.ack_at AS ackAt, i.reminded_at AS remindedAt, i.valid, i.notify_result AS notifyResult, l.owner_phone AS ownerPhone, d.name AS dongName
-    FROM inquiries i JOIN landings l ON l.id = i.landing_id LEFT JOIN dongs d ON d.slug = i.dong
-    WHERE i.valid = 1 AND i.notify_result = 'sent' AND i.ack_at IS NULL AND i.reminded_at IS NULL AND i.created_at <= ?`)
+    FROM inquiries i JOIN landings l ON l.id = i.landing_id AND l.status = 'published' LEFT JOIN dongs d ON d.slug = i.dong
+    WHERE i.valid = 1 AND i.notify_result = 'sent' AND i.ack_at IS NULL AND i.reminded_at IS NULL AND i.created_at <= ? ORDER BY i.id LIMIT 20`)
     .bind(iso(now - REMIND_AFTER_MS)).all()).results;
   for (const r of rows) {
     if (!needsReminder({ ...r, createdAt: Date.parse(r.createdAt) }, now)) continue;
