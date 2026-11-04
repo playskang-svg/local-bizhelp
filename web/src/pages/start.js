@@ -25,6 +25,7 @@ form.f button{font:inherit;border:0;cursor:pointer}form.f[hidden]{display:none}#
 <form id="f2" class="f" hidden><label>인증번호 6자리<input name="code" required inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="one-time-code"></label>
 <button class="btn" type="submit">등록하기</button></form>
 <p id="msg" role="status"></p>
+<p><a href="/edit">수정 주소를 잃어버리셨나요? 다시 받기</a></p>
 <script>
 const $=(i)=>document.getElementById(i),msg=$('msg');let claimId=0;
 async function post(url,data,btn){btn.disabled=true;msg.textContent='';

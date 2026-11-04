@@ -3,6 +3,7 @@ const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart
 
 export const OTP_TTL_MS = 300_000;
 export const OTP_MAX_ATTEMPTS = 5;
+export const otpText = (code) => `[로컬브릿지AI_천안] 인증번호: ${code} (5분 안에 입력해 주세요)`;
 
 export function newCode() {
   const n = crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000;

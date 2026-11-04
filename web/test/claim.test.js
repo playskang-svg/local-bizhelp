@@ -82,3 +82,20 @@ test('60 s cooldown blocks a second verify for the same phone', async () => {
   assert.match(again.error, /잠시 뒤에 다시 받아 주세요/);
   assert.equal(count('otps'), 1);
 });
+
+test('same owner phone re-registering gets a fresh link to the same landing, not held', async () => {
+  const { verify, confirm, count, D1 } = setup();
+  const a = await verify();
+  const first = await confirm(a.claimId, a.code);
+  const oldHash = D1.db.prepare('SELECT edit_token_hash h FROM landings').get().h;
+  D1.db.exec("DELETE FROM otps; UPDATE landings SET status = 'published'");
+  const b = await verify();
+  const again = await confirm(b.claimId, b.code);
+  assert.equal(again.status, 200);
+  assert.match(again.editUrl, /^\/edit#t=[A-Za-z0-9_-]{43}$/);
+  assert.notEqual(again.editUrl, first.editUrl);
+  assert.equal(again.held, undefined);
+  assert.deepEqual([count('businesses'), count('landings')], [1, 1]);
+  const r = D1.db.prepare('SELECT status, edit_token_hash h FROM landings').get();
+  assert.equal(r.status, 'published'); assert.notEqual(r.h, oldHash);
+});

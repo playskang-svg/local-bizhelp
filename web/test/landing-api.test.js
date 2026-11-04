@@ -12,7 +12,7 @@ async function setup(status = 'draft') {
   D1.db.exec("INSERT INTO dongs (slug,name,gu) VALUES ('dongnam-mokcheon-eup','목천읍','dongnam')");
   D1.db.exec("INSERT INTO businesses (id,name,trade,dong_id,source,claimed) VALUES (1,'테스트','clean',1,'self',1)");
   D1.db.prepare("INSERT INTO landings (business_id,slug,status,owner_phone,content,areas,edit_token_hash) VALUES (1,'s1',?,'01011112222','{\"name\":\"테스트\"}','[]',?)").run(status, await tokenHash('tok-1'));
-  const R2 = { puts: [], put: async (k) => { R2.puts.push(k); }, delete: async (k) => { R2.puts = R2.puts.filter((x) => x !== k); } };
+  const R2 = { puts: [], bodies: {}, put: async (k, v) => { R2.puts.push(k); R2.bodies[k] = v; }, delete: async (k) => { R2.puts = R2.puts.filter((x) => x !== k); } };
   return { env: { ...ENV, D1, R2 }, D1, R2 };
 }
 const row = (D1) => D1.db.prepare('SELECT * FROM landings').get();
@@ -34,7 +34,8 @@ test('chat and publish refuse held landing', async () => {
   assert.equal((await landingPublish(post({ token: 'tok-1' }), env)).status, 403);
   assert.equal(row(env.D1).status, 'held');
 });
-test('chat applies update; no tool call keeps draft; error keeps draft', async () => {
+test('chat applies update; no tool call keeps draft; error keeps draft', async (tc) => {
+  tc.mock.method(console, 'error', () => {});
   const { env, D1 } = await setup();
   const ok = await landingChat(post({ token: 'tok-1', message: '입주청소 해요' }), env, { chat: async () => ({ toolInput: { reply: '좋아요', update: { services: [{ title: '입주청소', detail: '' }], areas: ['dongnam-mokcheon-eup', 'x'] } } }) });
   const j = await ok.json();
@@ -108,7 +109,22 @@ test('area question reachable from a home-dong areas column; name locked; dong n
   assert.match(j.preview, /<h1>테스트<\/h1>/); assert.match(j.preview, /목천읍/); assert.doesNotMatch(j.preview, /dongnam-mokcheon/);
   assert.doesNotMatch(j.preview, /areasConfirmed/);
 });
-test('failed chat replies are flagged so the client skips history', async () => {
+test('chat prompt lists dong name=slug pairs, no name key; unknown areas keep the old ones', async () => {
+  const { env, D1 } = await setup();
+  D1.db.exec("UPDATE landings SET areas = '[\"dongnam-mokcheon-eup\"]'");
+  let system = '';
+  const chat = async (e, req) => { system = req.system; return { toolInput: { reply: 'r', update: { areas: ['seobuk-buldang-dong', 'buldang-1-dong'] } } }; };
+  await landingChat(post({ token: 'tok-1', message: '불당동이요' }), env, { chat });
+  assert.match(system, /불당1동=seobuk-buldang-1-dong/); assert.match(system, /목천읍=dongnam-mokcheon-eup/);
+  assert.match(system, /update 키: tagline,/);
+  assert.deepEqual(JSON.parse(row(D1).areas), ['dongnam-mokcheon-eup']);
+  assert.equal(JSON.parse(row(D1).content).areasConfirmed, undefined);
+  await landingChat(post({ token: 'tok-1', message: '불당1동이요' }), env, { chat: async () => ({ toolInput: { reply: 'r', update: { areas: ['불당1동'] } } }) });
+  assert.deepEqual(JSON.parse(row(D1).areas), ['seobuk-buldang-1-dong']);
+  assert.equal(JSON.parse(row(D1).content).areasConfirmed, true);
+});
+test('failed chat replies are flagged so the client skips history', async (t) => {
+  t.mock.method(console, 'error', () => {});
   const { env } = await setup();
   const j = await (await landingChat(post({ token: 'tok-1', message: 'a' }), env, { chat: async () => { throw new Error('anthropic 500'); } })).json();
   assert.equal(j.failed, true);
@@ -141,4 +157,56 @@ test('relink: known and unknown phones are indistinguishable; new token works, o
   assert.equal((await landingPublish(post({ token: 'tok-1' }), env)).status, 404);
   assert.equal((await landingPublish(post({ token: ok.editUrl.split('=')[1] }), env)).status, 200);
   assert.equal((await editLink(post({ handle: again.handle, code }), env, deps)).status, 404);
+});
+
+test('editor state carries the public slug', async () => {
+  const { env } = await setup('published');
+  const j = await (await landingState(post({ token: 'tok-1' }), env)).json();
+  assert.equal(j.slug, 's1'); assert.equal(j.status, 'published');
+});
+
+test('editor calls use their own rate-limit bucket (e:<ip>)', async () => {
+  const { env } = await setup();
+  const keys = [];
+  env.LIMIT = { limit: async ({ key }) => { keys.push(key); return { success: true }; } };
+  const req = (b) => new Request('http://x/', { method: 'POST', body: JSON.stringify(b), headers: { 'cf-connecting-ip': '1.2.3.4' } });
+  await landingState(req({ token: 'tok-1' }), env);
+  await editLink(req({ phone: '01000000000' }), env, { sendSMS: async () => {} });
+  assert.deepEqual(keys.slice(0, 2), ['e:1.2.3.4', 'e:1.2.3.4']);
+});
+
+test('relink finds a landing without a token unless it is held', async () => {
+  const { env, D1 } = await setup();
+  D1.db.exec('UPDATE landings SET edit_token_hash = NULL'); // e.g. a held claim the operator approved
+  const sent = [];
+  const deps = { sendSMS: async (e, to, t) => { sent.push(t); } };
+  const h = await (await editLink(post({ phone: '01011112222' }), env, deps)).json();
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0], `[로컬브릿지AI_천안] 인증번호: ${sent[0].match(/\d{6}/)[0]} (5분 안에 입력해 주세요)`);
+  const ok = await (await editLink(post({ handle: h.handle, code: sent[0].match(/\d{6}/)[0] }), env, deps)).json();
+  assert.equal((await landingState(post({ token: ok.editUrl.split('=')[1] }), env)).status, 200);
+  D1.db.exec("UPDATE landings SET status = 'held'; DELETE FROM otps");
+  await editLink(post({ phone: '01011112222' }), env, deps);
+  assert.equal(sent.length, 1); // held: decoy, no SMS
+});
+
+// SOI, APP0 JFIF, APP1 EXIF (orientation 6 + fake GPS text), APP1 XMP, DQT, SOS + data, EOI
+const seg = (m, payload) => [0xff, m, (payload.length + 2) >> 8, (payload.length + 2) & 255, ...payload];
+const ascii = (t) => [...new TextEncoder().encode(t)];
+const exif = [...ascii('Exif'), 0, 0, 0x49, 0x49, 42, 0, 8, 0, 0, 0, 1, 0, 0x12, 1, 3, 0, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, ...ascii('GPS-SECRET')];
+const JPEG = new Uint8Array([0xff, 0xd8, ...seg(0xe0, [...ascii('JFIF'), 0, 1, 1, 0, 0, 1, 0, 1, 0, 0]), ...seg(0xe1, exif),
+  ...seg(0xe1, ascii('http://ns.adobe.com/xap/1.0/\0GPSLatitude')), ...seg(0xdb, [0, 1]), ...seg(0xda, [1, 2, 3]), 0x12, 0xff, 0x00, 0x34, 0xff, 0xd9]);
+
+test('jpeg upload drops EXIF/XMP but keeps orientation; png untouched', async () => {
+  const { env, R2 } = await setup();
+  assert.equal((await upload(env, JPEG)).status, 200);
+  const out = Buffer.from(R2.bodies[R2.puts[0]]);
+  assert.ok(!out.includes('GPS'));
+  assert.ok(out.includes('JFIF'));
+  const at = out.indexOf(Buffer.from([0xff, 0xe1]));
+  assert.deepEqual([...out.subarray(at, at + 36)], [0xff, 0xe1, 0, 34, ...ascii('Exif'), 0, 0, 0x4d, 0x4d, 0, 42, 0, 0, 0, 8, 0, 1, 1, 0x12, 0, 3, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0]);
+  assert.equal(out.indexOf(Buffer.from([0xff, 0xe1]), at + 1), -1);
+  assert.deepEqual([...out.subarray(-14)], [...JPEG.subarray(-14)]); // DQT, scan and data copied as is
+  assert.equal((await upload(env, PNG)).status, 200);
+  assert.deepEqual([...R2.bodies[R2.puts[1]]], [...PNG]);
 });

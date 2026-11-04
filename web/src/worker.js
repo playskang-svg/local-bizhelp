@@ -49,6 +49,10 @@ const ROUTES = [
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.protocol === 'http:' && !['localhost', '127.0.0.1'].includes(url.hostname)) {
+      url.protocol = 'https:';
+      return Response.redirect(url.href, 301);
+    }
     const src = cleanSrc(url.searchParams.get('src'));
     for (const [re, fn] of ROUTES) {
       const m = url.pathname.match(re);

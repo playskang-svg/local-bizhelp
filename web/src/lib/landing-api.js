@@ -1,8 +1,8 @@
 import { newToken, tokenHash } from './tokens.js';
-import { newCode, hash, checkOtp, OTP_TTL_MS, OTP_MAX_ATTEMPTS } from './otp.js';
+import { newCode, hash, checkOtp, otpText, OTP_TTL_MS, OTP_MAX_ATTEMPTS } from './otp.js';
 import { sendSMS } from './popbill.js';
 import { chat as anthropicChat } from './anthropic.js';
-import { applyUpdate, nextQuestion } from './landing-draft.js';
+import { applyUpdate, nextQuestion, DONG_PAIRS } from './landing-draft.js';
 import { renderLanding } from '../pages/landing.js';
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
@@ -22,7 +22,8 @@ async function pre(req, env, need = []) {
   if (req.method !== 'POST') return err(405, '잘못된 요청이에요.');
   const missing = need.find((k) => !env[k]);
   if (missing) return err(503, `설정이 필요해요: ${missing}`);
-  if (env.LIMIT && !(await env.LIMIT.limit({ key: req.headers.get('cf-connecting-ip') || 'local' })).success) {
+  // editor bucket (e:), so chatting and uploads do not use up the claim/inquiry buckets
+  if (env.LIMIT && !(await env.LIMIT.limit({ key: `e:${req.headers.get('cf-connecting-ip') || 'local'}` })).success) {
     return err(429, '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.');
   }
   return null;
@@ -30,11 +31,11 @@ async function pre(req, env, need = []) {
 
 async function byToken(env, token) {
   if (typeof token !== 'string' || !token || token.length > 100) return null;
-  return env.D1.prepare('SELECT l.id, l.status, l.content, l.areas, l.game_consent AS gameConsent, b.name AS bizName FROM landings l LEFT JOIN businesses b ON b.id = l.business_id WHERE l.edit_token_hash = ?').bind(await tokenHash(token)).first();
+  return env.D1.prepare('SELECT l.id, l.slug, l.status, l.content, l.areas, l.game_consent AS gameConsent, b.name AS bizName FROM landings l LEFT JOIN businesses b ON b.id = l.business_id WHERE l.edit_token_hash = ?').bind(await tokenHash(token)).first();
 }
 const view = (row, content, areas) => ({
   draft: { ...content, areas }, preview: renderLanding({ name: row.bizName, content, areas }), next: nextQuestion({ ...content, areas }),
-  status: row.status, gameConsent: !!row.gameConsent,
+  status: row.status, slug: row.slug, gameConsent: !!row.gameConsent,
 });
 
 const SYSTEM = `당신은 동네 가게 대표님이 랜딩 페이지를 만들도록 돕는 도우미예요.
@@ -43,10 +44,11 @@ const SYSTEM = `당신은 동네 가게 대표님이 랜딩 페이지를 만들�
 - 한 번에 한 가지만 물어봐요.
 - 대표님이 말하지 않은 가격, 자격, 실적, 연도, 후기를 절대 지어내지 않아요.
 - 매 답변마다 반드시 respond 도구를 한 번 불러요. reply에는 대표님께 보여 줄 말, update에는 이번 대화로 새로 알게 된 항목만 넣어요.
-- update 키: name, tagline, intro, services[{title,detail}], excludes[string], extraCosts[{when,note}], hours, phone, channels{naverPlace,instagram,kakao,blog}, areas[동네 slug].
+- update 키: tagline, intro, services[{title,detail}], excludes[string], extraCosts[{when,note}], hours, phone, channels{naverPlace,instagram,kakao,blog}, areas[동네 slug].
 - 가게 이름은 인증된 값이라 대화로 바꿀 수 없어요. 바꿔 달라고 하면 정중히 어렵다고 말해요.
-- 대표님이 "없어요"라고 하면 해당 배열을 빈 배열로 보내요.
-- areas는 천안 동네 slug(예: dongnam-mokcheon-eup)만 써요.`;
+- 대표님이 "없어요"라고 하면 해당 배열을 빈 배열로 보내요. areas는 빈 배열로 보내지 않아요.
+- areas에는 아래 천안 동네 목록(이름=slug)의 slug만 써요. 목록에 없는 동네는 넣지 말고 대표님께 다시 여쭤봐요.
+${DONG_PAIRS}`;
 const TOOL = {
   name: 'respond',
   description: '대표님께 답하고 랜딩 초안을 갱신해요',
@@ -123,6 +125,41 @@ function sniff(u8) {
   return null;
 }
 
+// EXIF orientation tag (1-8) from an APP1 payload, 0 if none
+function orientation(b) {
+  try {
+    const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+    if (v.getUint32(0) !== 0x45786966 || v.getUint16(4) !== 0) return 0; // "Exif\0\0"
+    const le = v.getUint16(6) === 0x4949;
+    const ifd = 6 + v.getUint32(10, le);
+    for (let k = 0, n = v.getUint16(ifd, le); k < n; k++) {
+      if (v.getUint16(ifd + 2 + k * 12, le) === 0x0112) return v.getUint16(ifd + 10 + k * 12, le);
+    }
+  } catch { /* truncated EXIF */ }
+  return 0;
+}
+// Drops APP1 segments (EXIF/XMP: GPS, device, time) before the image data. The orientation tag is
+// kept as a minimal APP1 so phone photos do not turn sideways. Everything else is copied as is.
+export function stripExif(u8) {
+  const parts = [u8.subarray(0, 2)];
+  let i = 2;
+  while (i + 4 <= u8.length && u8[i] === 0xff && u8[i + 1] !== 0xda) {
+    if (u8[i + 1] === 0xff) { i++; continue; } // fill byte
+    const end = i + 2 + ((u8[i + 2] << 8) | u8[i + 3]);
+    if (u8[i + 1] !== 0xe1) parts.push(u8.subarray(i, end));
+    else {
+      const o = orientation(u8.subarray(i + 4, end));
+      if (o > 1 && o <= 8) parts.push(Uint8Array.of(0xff, 0xe1, 0, 34, 0x45, 0x78, 0x69, 0x66, 0, 0, 0x4d, 0x4d, 0, 42, 0, 0, 0, 8, 0, 1, 1, 0x12, 0, 3, 0, 0, 0, 1, 0, o, 0, 0, 0, 0, 0, 0));
+    }
+    i = end;
+  }
+  parts.push(u8.subarray(i));
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let at = 0;
+  for (const p of parts) { out.set(p, at); at += p.length; }
+  return out;
+}
+
 export async function landingPhoto(req, env) {
   const bad = await pre(req, env);
   if (bad) return bad;
@@ -140,7 +177,7 @@ export async function landingPhoto(req, env) {
   const kind = sniff(bytes);
   if (!kind) return err(415, 'JPG, PNG, WEBP 사진만 올릴 수 있어요.');
   const key = `landings/${row.id}/${crypto.randomUUID()}.${kind[1]}`;
-  await env.R2.put(key, bytes, { httpMetadata: { contentType: kind[0] } });
+  await env.R2.put(key, kind[1] === 'jpg' ? stripExif(bytes) : bytes, { httpMetadata: { contentType: kind[0] } });
   // atomic append so parallel uploads do not drop each other
   // limit enforced inside the append so parallel uploads cannot exceed it
   const added = await env.D1.prepare("UPDATE landings SET content = json_set(COALESCE(content,'{}'), '$.photos', json_insert(COALESCE(json_extract(content,'$.photos'),'[]'), '$[#]', ?)), updated_at = ? WHERE id = ? AND json_array_length(COALESCE(json_extract(content,'$.photos'),'[]')) < ?")
@@ -181,7 +218,7 @@ async function relinkStart(env, b, deps) {
   const recent = await env.D1.prepare('SELECT 1 AS x FROM otps WHERE phone_hash = ? AND purpose = ? AND created_at > ? LIMIT 1')
     .bind(phoneHash, 'relink', new Date(now - COOLDOWN_MS).toISOString()).first();
   if (recent) return err(429, '잠시 뒤에 다시 받아 주세요.');
-  const land = await env.D1.prepare('SELECT id FROM landings WHERE owner_phone = ? AND edit_token_hash IS NOT NULL ORDER BY id DESC LIMIT 1').bind(phone).first();
+  const land = await env.D1.prepare("SELECT id FROM landings WHERE owner_phone = ? AND status != 'held' ORDER BY id DESC LIMIT 1").bind(phone).first();
   // Unknown phone: decoy row (landingId null, random code, can never succeed), no SMS, same shape and cooldown.
   // The missing SMS round-trip is a timing difference we accept.
   const code = newCode();
@@ -191,7 +228,7 @@ async function relinkStart(env, b, deps) {
   ).bind(phoneHash, await hash(code, env.OTP_PEPPER), 'relink', JSON.stringify({ landingId: land?.id ?? null, handleHash: await tokenHash(secret) }), now + OTP_TTL_MS, iso, iso).run();
   const rowId = ins.meta.last_row_id;
   try {
-    if (land) await deps.sendSMS(env, phone, `[로컬브릿지AI] 인증번호는 ${code}예요. 5분 안에 입력해 주세요.`);
+    if (land) await deps.sendSMS(env, phone, otpText(code));
   } catch {
     await env.D1.prepare('DELETE FROM otps WHERE id = ?').bind(rowId).run();
     return err(502, '인증 문자를 보내지 못했어요. 잠시 후 다시 시도해 주세요.');

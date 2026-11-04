@@ -7,6 +7,11 @@ const CLIENT = `
   var token = (location.hash.match(/^#t=([A-Za-z0-9_-]+)$/) || [])[1] || '';
   var $ = function (id) { return document.getElementById(id); };
   var turns = [];
+  var slug = '';
+  function showLink() {
+    var url = location.origin + '/p/' + slug;
+    $('pubOpen').href = '/p/' + slug; $('pubUrl').textContent = url; $('pubLink').hidden = false;
+  }
   function say(who, text) {
     var d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
     $('log').appendChild(d); d.scrollIntoView({ block: 'nearest' });
@@ -19,7 +24,8 @@ const CLIENT = `
     if (j.preview !== undefined) $('preview').innerHTML = j.preview; // server-escaped HTML
     if (j.status === 'held') { $('publishBox').hidden = true; $('heldBox').hidden = false; $('chatForm').hidden = true; }
     else { $('publishBox').hidden = false; $('heldBox').hidden = true; }
-    if (j.status === 'published') $('pubBtn').textContent = '확인했어요';
+    if (j.slug) slug = j.slug;
+    if (j.status === 'published') { $('pubBtn').textContent = '확인했어요'; showLink(); }
     if (j.gameConsent) $('consent').checked = true;
   }
   function noToken() { $('app').hidden = true; $('relink').hidden = false; }
@@ -54,8 +60,12 @@ const CLIENT = `
     post('/api/landing/publish', { token: token, gameConsent: $('consent').checked }).then(function (r) {
       $('pubBtn').disabled = false;
       $('pubMsg').textContent = r.ok ? (live ? '확인했어요.' : '공개했어요.') : r.j.error;
-      if (r.ok) $('pubBtn').textContent = '확인했어요';
+      if (r.ok) { $('pubBtn').textContent = '확인했어요'; showLink(); }
     });
+  });
+  $('copyBtn').addEventListener('click', function () {
+    var url = $('pubUrl').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { $('copyBtn').textContent = '복사했어요'; });
   });
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SR) {
@@ -103,7 +113,9 @@ export function editPage() {
 <label class="btn ghost filebtn">사진 올리기<input type="file" id="photo" accept="image/jpeg,image/png,image/webp"></label></form></section>
 <h2>미리보기</h2><section id="preview" class="panel"></section>
 <section class="panel" id="publishBox"><label><input type="checkbox" id="consent"> 게임·홍보에 가게 이름이 나와도 괜찮아요</label>
-<p><button class="btn" id="pubBtn">공개하기</button> <span id="pubMsg"></span></p></section>
+<p><button class="btn" id="pubBtn">공개하기</button> <span id="pubMsg"></span></p>
+<div id="pubLink" hidden><p>내 가게 페이지 주소: <span id="pubUrl"></span></p>
+<p><a class="btn" id="pubOpen" target="_blank" rel="noopener">내 가게 페이지 열기</a> <button type="button" class="btn ghost" id="copyBtn">주소 복사</button></p></div></section>
 <section class="panel" id="heldBox" hidden><b>확인 중이에요</b><p class="lead">확인이 끝나면 안내해 드릴게요.</p></section>
 </div>
 <section class="panel" id="relink" hidden><h2>수정 주소를 다시 받을게요</h2>

@@ -77,3 +77,8 @@ test('public page escapes name; non-https channel dropped; call 204 any method',
   assert.ok(!h.includes('http://a.example') && h.includes('https://k.example'));
   assert.equal((await worker.fetch(new Request('https://x/api/call'), env)).status, 204);
 });
+
+test('dong page cards use the verified business name (R17)', async () => {
+  const h = await (await get(await setup('published', { name: '옛이름', tagline: '친절해요' }), '/d/dongnam-mokcheon-eup')).text();
+  assert.ok(h.includes('<h2>테스트청소</h2>')); assert.ok(!h.includes('옛이름'));
+});

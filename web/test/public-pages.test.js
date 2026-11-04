@@ -67,3 +67,17 @@ test('/privacy lists every collected field', async () => {
   const h = await (await get(setup(), '/privacy')).text();
   for (const s of ['사업자등록번호', '대표자 성명', '개업일자', '상호', '휴대폰', '사진', '소개', '게임·홍보에 가게 이름 노출 동의', '동네', '작업 내용', '희망 날짜', '연락 동의', '유입 경로']) assert.ok(h.includes(s), s);
 });
+
+test('http redirects to https (301) except localhost', async () => {
+  const env = setup();
+  const r = await worker.fetch(new Request('http://local.bizhelp.kr/p/x?src=a'), env);
+  assert.equal(r.status, 301);
+  assert.equal(r.headers.get('location'), 'https://local.bizhelp.kr/p/x?src=a');
+  assert.equal((await worker.fetch(new Request('http://localhost:8787/robots.txt'), env)).status, 200);
+  assert.equal((await worker.fetch(new Request('http://127.0.0.1:8787/robots.txt'), env)).status, 200);
+});
+
+test('/start links to the relink screen', async () => {
+  const h = await (await get(setup(), '/start')).text();
+  assert.match(h, /<a href="\/edit">수정 주소를 잃어버리셨나요\? 다시 받기<\/a>/);
+});

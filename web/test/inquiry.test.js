@@ -121,7 +121,7 @@ async function seedReminders(h) {
   const { post, sent, D1 } = h;
   for (const p of ['010-9999-0000', '010-1111-2222', '010-3333-4444', '010-5555-1111']) await post({ phone: p });
   const old = new Date(NOON - 13 * 3600e3).toISOString();
-  D1.db.exec(`UPDATE inquiries SET created_at='${old}' WHERE id IN (1,2,3); UPDATE inquiries SET created_at='${new Date(NOON).toISOString()}' WHERE id=4`);
+  D1.db.exec(`UPDATE inquiries SET created_at='${old}', notified_at='${old}' WHERE id IN (1,2,3); UPDATE inquiries SET created_at='${new Date(NOON).toISOString()}' WHERE id=4`);
   return sent.map((x) => ({ ...x }));
 }
 
@@ -142,11 +142,11 @@ test('scheduled: one reminder for old un-acked, same text, deletes expired otps'
   assert.equal(sent.length, 1);
 });
 
-test('reminders skip failed and config-missing rows, unpublished landings; quiet hours wait; max 20', async () => {
+test('reminders skip failed-final, config-missing and capped rows, unpublished landings; quiet hours wait; max 20', async () => {
   const h = setup();
   const { sent, D1, env, deps } = h;
   await seedReminders(h);
-  D1.db.exec("UPDATE inquiries SET notify_result='failed' WHERE id=1; UPDATE inquiries SET notify_result='config-missing' WHERE id=2; UPDATE inquiries SET notify_result='capped' WHERE id=3");
+  D1.db.exec("UPDATE inquiries SET notify_result='failed-final' WHERE id=1; UPDATE inquiries SET notify_result='config-missing' WHERE id=2; UPDATE inquiries SET notify_result='capped' WHERE id=3");
   sent.length = 0;
   await runCron(env, deps, NOON);
   assert.equal(sent.length, 0);
@@ -218,10 +218,55 @@ test('missing Popbill secret still stores with config-missing', async () => {
   assert.equal(sent.length, 0);
 });
 
-test('SMS failure still returns success, records failed', async () => {
+test('SMS failure still returns success, records failed', async (t) => {
+  t.mock.method(console, 'error', () => {});
   const { env, rows } = setup();
   const bad = { sendLMS: async () => { throw new Error('boom'); } };
   const r = await submitInquiry(new Request('http://x/', { method: 'POST', body: JSON.stringify({ slug: 'a-pub', dong: 'dongnam-mokcheon-eup', work: 'x', phone: '01012340000', consent: true }) }), env, bad);
   assert.equal(r.status, 200);
   assert.equal(rows()[0].notify_result, 'failed');
+});
+
+test('work with a link or domain is rejected', () => {
+  for (const work of ['http://bit.ly/x 확인', '사진은 www.abc 에', 'abc.com 참고', '청소 .kr 문의', 'naver.me/abc', 'HTTPS 주소']) {
+    const r = validateInquiry({ ...base, work }, landing, now);
+    assert.deepEqual([r.ok, r.field, r.message], [false, 'work', '작업 내용에는 주소(링크)를 넣을 수 없어요.'], work);
+  }
+  for (const work of ['입주청소 24평', '에어컨 2.5kW 설치', '3.5m 붙박이장', 'LG 세탁기 이전']) assert.equal(validateInquiry({ ...base, work }, landing, now).ok, true, work);
+});
+
+test('cron retries a failed owner alert once: claims, respects quiet hours and caps, no same-run reminder', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  const h = setup();
+  const { rows, sent, D1, env, deps } = h;
+  await seedReminders(h); // ids 1-3 are 13 h old
+  D1.db.exec("UPDATE inquiries SET notify_result='failed', ack_token_hash=NULL WHERE id IN (1,2); UPDATE inquiries SET notify_result='config-missing' WHERE id=3; UPDATE inquiries SET reminded_at='x' WHERE id=4");
+  sent.length = 0;
+  await runCron(env, deps, Date.parse('2026-11-05T22:00:00+09:00')); // quiet hours
+  assert.equal(sent.length, 0);
+  // landing cap reached today: stays 'failed'
+  const many = Array.from({ length: 20 }, (_, i) => `(1,'dongnam-mokcheon-eup','x','0100000${String(i).padStart(4, '0')}',1,0,'sent','${new Date(NOON).toISOString()}')`).join(',');
+  D1.db.exec(`INSERT INTO inquiries (landing_id, dong, work, customer_phone, consent, valid, notify_result, created_at) VALUES ${many}`);
+  await runCron(env, deps, NOON);
+  assert.equal(sent.length, 0); assert.equal(rows()[0].notify_result, 'failed');
+  D1.db.exec("DELETE FROM inquiries WHERE id > 4");
+  // id 2 fails again -> failed-final; id 1 goes out with a working ack link; id 3 (config-missing) untouched
+  const flaky = { sendLMS: async (e, to, subject, text) => { if (/01011112222/.test(text)) throw new Error('boom'); sent.push({ to, subject, text }); } };
+  await runCron(env, flaky, NOON);
+  assert.deepEqual(rows().slice(0, 3).map((r) => r.notify_result), ['sent', 'failed-final', 'config-missing']);
+  assert.equal(sent.length, 1); // no reminder right after the late retry
+  assert.match(sent[0].text, /01099990000/);
+  assert.equal(rows()[0].notified_at, new Date(NOON).toISOString());
+  assert.equal((await ackPost(ackReq(tokOf(sent)), env)).status, 200);
+  await runCron(env, flaky, NOON + 1000);
+  assert.equal(sent.length, 1); // failed-final is never retried, retried row not resent
+});
+
+test('cron deletes inquiries older than 365 days', async () => {
+  const { D1, env, rows } = setup();
+  D1.db.exec(`INSERT INTO inquiries (landing_id, dong, work, customer_phone, consent, created_at) VALUES
+    (1,'dongnam-mokcheon-eup','old','01000000001',1,'${new Date(NOON - 366 * 86400e3).toISOString()}'),
+    (1,'dongnam-mokcheon-eup','keep','01000000002',1,'${new Date(NOON - 364 * 86400e3).toISOString()}')`);
+  await runCron(env, {}, Date.parse('2026-11-05T22:00:00+09:00')); // runs even in quiet hours
+  assert.deepEqual(rows().map((r) => r.work), ['keep']);
 });

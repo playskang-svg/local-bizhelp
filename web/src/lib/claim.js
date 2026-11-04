@@ -1,6 +1,6 @@
 import { validBizNo } from './bizno.js';
 import { ntsValidate } from './nts.js';
-import { newCode, hash, checkOtp, OTP_TTL_MS, OTP_MAX_ATTEMPTS } from './otp.js';
+import { newCode, hash, checkOtp, otpText, OTP_TTL_MS, OTP_MAX_ATTEMPTS } from './otp.js';
 import { newToken, tokenHash } from './tokens.js';
 import { sendSMS } from './popbill.js';
 import { TRADES } from '../pages/dong.js';
@@ -74,7 +74,7 @@ export async function claimVerify(req, env, deps = { ntsValidate, sendSMS }) {
   ).bind(phoneHash, await hash(code, env.OTP_PEPPER), 'claim', JSON.stringify({ ...d, handleHash: await tokenHash(secret) }), now + OTP_TTL_MS, iso, iso).run();
   const rowId = ins.meta.last_row_id;
   try {
-    await deps.sendSMS(env, d.phone, `[로컬브릿지AI] 인증번호는 ${code}예요. 5분 안에 입력해 주세요.`);
+    await deps.sendSMS(env, d.phone, otpText(code));
   } catch {
     await env.D1.prepare('DELETE FROM otps WHERE id = ?').bind(rowId).run();
     return err(502, '인증 문자를 보내지 못했어요. 잠시 후 다시 시도해 주세요.');
@@ -126,6 +126,13 @@ export async function claimConfirm(req, env) {
     const dup = await env.D1.prepare('SELECT id FROM businesses WHERE name = ? AND dong_id = ? AND trade = ? AND claimed = 1 LIMIT 1').bind(p.name, dr.id, p.trade).first();
     const verdict = decideClaim({ existingClaimed: !!dup });
     const iso = new Date().toISOString();
+    // same owner phone re-registering (lost link): hand back a fresh link to the existing landing instead of holding
+    const own = dup && await env.D1.prepare("SELECT id FROM landings WHERE business_id = ? AND owner_phone = ? AND status != 'held' ORDER BY id DESC LIMIT 1").bind(dup.id, p.phone).first();
+    if (own) {
+      const token = newToken();
+      await env.D1.prepare('UPDATE landings SET edit_token_hash = ?, updated_at = ? WHERE id = ?').bind(await tokenHash(token), iso, own.id).run();
+      return json({ editUrl: `/edit#t=${token}` });
+    }
     const rand = [...crypto.getRandomValues(new Uint8Array(6))].map((n) => (n % 36).toString(36)).join('');
     const slug = `${dr.slug}-${p.trade}-${rand}`;
     const mk = (biz) => env.D1.prepare('INSERT INTO landings (business_id, slug, status, biz_no, biz_verified_at, owner_phone, phone_verified_at, content, areas, edit_token_hash, billing, created_at, updated_at) VALUES (' + biz + ',?,?,?,?,?,?,?,?,?,?,?,?)');

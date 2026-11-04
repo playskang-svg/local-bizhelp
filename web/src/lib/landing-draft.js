@@ -1,6 +1,9 @@
 import dongs from '../../../shared/dongs.json' with { type: 'json' };
 
-const SLUGS = new Set(dongs.map((d) => d.slug));
+// name (spaces ignored) or slug -> slug
+const TO_SLUG = new Map(dongs.flatMap((d) => [[d.slug, d.slug], [d.name, d.slug]]));
+const toSlug = (v) => (typeof v === 'string' ? TO_SLUG.get(v.replace(/\s/g, '')) : undefined);
+export const DONG_PAIRS = dongs.map((d) => `${d.name}=${d.slug}`).join(', ');
 const MAX_STR = 600;
 const MAX_ARR = 20;
 const s = (v) => (typeof v === 'string' ? v.trim().slice(0, MAX_STR) : '');
@@ -29,14 +32,16 @@ export function applyUpdate(draft, update) {
     out.channels = ch;
   }
   const res = { draft: out };
-  if (Array.isArray(update.areas)) {
-    res.areas = [...new Set(update.areas.filter((x) => SLUGS.has(x)))].slice(0, MAX_ARR);
+  // areas never become empty: an empty or all-unknown list is no update, and the question stays open
+  const areas = Array.isArray(update.areas) ? [...new Set(update.areas.map(toSlug).filter(Boolean))].slice(0, MAX_ARR) : [];
+  if (areas.length) {
+    res.areas = areas;
     out.areasConfirmed = true; // R16: owner answered the area question
   }
   return res;
 }
 
-// draft may carry `areas` (merged by the caller). Empty array = owner answered "none".
+// draft may carry `areas` (merged by the caller). Empty excludes/extraCosts array = owner answered "none".
 export function nextQuestion(d = {}) {
   if (!d.services?.length) return '어떤 일을 하시는지 알려 주세요. 대표 서비스 한두 가지부터 말씀해 주세요.';
   if (d.excludes === undefined) return '반대로 하지 않는 일이나 빼는 일이 있나요? 없으면 "없어요"라고 해 주세요.';
