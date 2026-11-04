@@ -70,6 +70,10 @@ export default buildConfig({
   routes: { admin: '/admin', api: '/cms-api' },
   admin: {
     user: Users.slug,
+    components: {
+      afterNavLinks: ['/views/MetricsLink'],
+      views: { metrics: { Component: '/views/Metrics', path: '/metrics' } },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

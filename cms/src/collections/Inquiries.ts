@@ -5,7 +5,7 @@ import { signedIn } from './access'
 export const Inquiries: CollectionConfig = {
   slug: 'inquiries',
   labels: { singular: '문의', plural: '문의' },
-  admin: { group: '기록', defaultColumns: ['landing', 'dong', 'work', 'valid', 'outcome', 'createdAt'] },
+  admin: { group: '기록', defaultColumns: ['createdAt', 'landing', 'dong', 'valid', 'notifyResult', 'ackAt'] },
   access: { read: signedIn, create: signedIn, update: signedIn, delete: signedIn },
   defaultSort: '-createdAt',
   fields: [

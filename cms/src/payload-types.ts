@@ -69,6 +69,13 @@ export interface Config {
   collections: {
     media: Media;
     users: User;
+    dongs: Dong;
+    businesses: Business;
+    landings: Landing;
+    inquiries: Inquiry;
+    'call-clicks': CallClick;
+    worklogs: Worklog;
+    otps: Otp;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +85,13 @@ export interface Config {
   collectionsSelect: {
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    dongs: DongsSelect<false> | DongsSelect<true>;
+    businesses: BusinessesSelect<false> | BusinessesSelect<true>;
+    landings: LandingsSelect<false> | LandingsSelect<true>;
+    inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
+    'call-clicks': CallClicksSelect<false> | CallClicksSelect<true>;
+    worklogs: WorklogsSelect<false> | WorklogsSelect<true>;
+    otps: OtpsSelect<false> | OtpsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -163,6 +177,145 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dongs".
+ */
+export interface Dong {
+  id: number;
+  slug: string;
+  name: string;
+  gu: 'dongnam' | 'seobuk';
+  isatipsSlug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "businesses".
+ */
+export interface Business {
+  id: number;
+  name: string;
+  trade: 'move' | 'clean' | 'install' | 'repair';
+  dong?: (number | null) | Dong;
+  address?: string | null;
+  source?: ('sdsc' | 'self') | null;
+  sdscId?: string | null;
+  claimed?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landings".
+ */
+export interface Landing {
+  id: number;
+  business: number | Business;
+  slug: string;
+  status?: ('draft' | 'published' | 'held') | null;
+  bizNo?: string | null;
+  bizVerifiedAt?: string | null;
+  ownerPhone?: string | null;
+  phoneVerifiedAt?: string | null;
+  content?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  areas?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  gameConsent?: boolean | null;
+  reviewedAt?: string | null;
+  editTokenHash?: string | null;
+  billing?: ('none' | 'intent' | 'paid' | 'test') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries".
+ */
+export interface Inquiry {
+  id: number;
+  landing: number | Landing;
+  dong?: string | null;
+  work?: string | null;
+  wishDate?: string | null;
+  customerPhone?: string | null;
+  consent?: boolean | null;
+  src?: string | null;
+  valid?: boolean | null;
+  invalidReason?: string | null;
+  notifiedAt?: string | null;
+  notifyResult?: string | null;
+  ackTokenHash?: string | null;
+  ackAt?: string | null;
+  remindedAt?: string | null;
+  outcome?: ('none' | 'contract' | 'lost') | null;
+  outcomeNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "call-clicks".
+ */
+export interface CallClick {
+  id: number;
+  landing: number | Landing;
+  src?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "worklogs".
+ */
+export interface Worklog {
+  id: number;
+  landing: number | Landing;
+  minutes?: number | null;
+  date?: string | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "otps".
+ */
+export interface Otp {
+  id: number;
+  phoneHash: string;
+  codeHash: string;
+  purpose: 'claim' | 'relink';
+  payload?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  expiresAt: number;
+  attempts?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -192,6 +345,34 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'dongs';
+        value: number | Dong;
+      } | null)
+    | ({
+        relationTo: 'businesses';
+        value: number | Business;
+      } | null)
+    | ({
+        relationTo: 'landings';
+        value: number | Landing;
+      } | null)
+    | ({
+        relationTo: 'inquiries';
+        value: number | Inquiry;
+      } | null)
+    | ({
+        relationTo: 'call-clicks';
+        value: number | CallClick;
+      } | null)
+    | ({
+        relationTo: 'worklogs';
+        value: number | Worklog;
+      } | null)
+    | ({
+        relationTo: 'otps';
+        value: number | Otp;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -274,6 +455,114 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dongs_select".
+ */
+export interface DongsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  gu?: T;
+  isatipsSlug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "businesses_select".
+ */
+export interface BusinessesSelect<T extends boolean = true> {
+  name?: T;
+  trade?: T;
+  dong?: T;
+  address?: T;
+  source?: T;
+  sdscId?: T;
+  claimed?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landings_select".
+ */
+export interface LandingsSelect<T extends boolean = true> {
+  business?: T;
+  slug?: T;
+  status?: T;
+  bizNo?: T;
+  bizVerifiedAt?: T;
+  ownerPhone?: T;
+  phoneVerifiedAt?: T;
+  content?: T;
+  areas?: T;
+  gameConsent?: T;
+  reviewedAt?: T;
+  editTokenHash?: T;
+  billing?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries_select".
+ */
+export interface InquiriesSelect<T extends boolean = true> {
+  landing?: T;
+  dong?: T;
+  work?: T;
+  wishDate?: T;
+  customerPhone?: T;
+  consent?: T;
+  src?: T;
+  valid?: T;
+  invalidReason?: T;
+  notifiedAt?: T;
+  notifyResult?: T;
+  ackTokenHash?: T;
+  ackAt?: T;
+  remindedAt?: T;
+  outcome?: T;
+  outcomeNote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "call-clicks_select".
+ */
+export interface CallClicksSelect<T extends boolean = true> {
+  landing?: T;
+  src?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "worklogs_select".
+ */
+export interface WorklogsSelect<T extends boolean = true> {
+  landing?: T;
+  minutes?: T;
+  date?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "otps_select".
+ */
+export interface OtpsSelect<T extends boolean = true> {
+  phoneHash?: T;
+  codeHash?: T;
+  purpose?: T;
+  payload?: T;
+  expiresAt?: T;
+  attempts?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
