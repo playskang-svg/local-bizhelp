@@ -10,6 +10,13 @@ import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Dongs } from './collections/Dongs'
+import { Businesses } from './collections/Businesses'
+import { Landings } from './collections/Landings'
+import { Inquiries } from './collections/Inquiries'
+import { CallClicks } from './collections/CallClicks'
+import { Worklogs } from './collections/Worklogs'
+import { Otps } from './collections/Otps'
 import { ko } from '@payloadcms/translations/languages/ko'
 
 const filename = fileURLToPath(import.meta.url)
@@ -69,7 +76,7 @@ export default buildConfig({
   },
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
   i18n: { supportedLanguages: { ko }, fallbackLanguage: 'ko' },
-  collections: [Media, Users],
+  collections: [Media, Users, Dongs, Businesses, Landings, Inquiries, CallClicks, Worklogs, Otps],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

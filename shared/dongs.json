@@ -1,0 +1,188 @@
+[
+  {
+    "slug": "dongnam-mokcheon-eup",
+    "name": "목천읍",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-mokcheon-eup-moving"
+  },
+  {
+    "slug": "dongnam-pungse-myeon",
+    "name": "풍세면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-pungse-myeon-moving"
+  },
+  {
+    "slug": "dongnam-gwangdeok-myeon",
+    "name": "광덕면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-gwangdeok-myeon-moving"
+  },
+  {
+    "slug": "dongnam-buk-myeon",
+    "name": "북면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-buk-myeon-moving"
+  },
+  {
+    "slug": "dongnam-seongnam-myeon",
+    "name": "성남면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-seongnam-myeon-moving"
+  },
+  {
+    "slug": "dongnam-susin-myeon",
+    "name": "수신면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-susin-myeon-moving"
+  },
+  {
+    "slug": "dongnam-byeongcheon-myeon",
+    "name": "병천면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-byeongcheon-myeon-moving"
+  },
+  {
+    "slug": "dongnam-dong-myeon",
+    "name": "동면",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-dong-myeon-moving"
+  },
+  {
+    "slug": "dongnam-jungang-dong",
+    "name": "중앙동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-jungang-dong-moving"
+  },
+  {
+    "slug": "dongnam-munseong-dong",
+    "name": "문성동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-munseong-dong-moving"
+  },
+  {
+    "slug": "dongnam-wonseong-1-dong",
+    "name": "원성1동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-wonseong-1-dong-moving"
+  },
+  {
+    "slug": "dongnam-wonseong-2-dong",
+    "name": "원성2동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-wonseong-2-dong-moving"
+  },
+  {
+    "slug": "dongnam-bongmyeong-dong",
+    "name": "봉명동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-bongmyeong-dong-moving"
+  },
+  {
+    "slug": "dongnam-ilbong-dong",
+    "name": "일봉동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-ilbong-dong-moving"
+  },
+  {
+    "slug": "dongnam-sinbang-dong",
+    "name": "신방동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-sinbang-dong-moving"
+  },
+  {
+    "slug": "dongnam-cheongnyong-dong",
+    "name": "청룡동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-cheongnyong-dong-moving"
+  },
+  {
+    "slug": "dongnam-sinan-dong",
+    "name": "신안동",
+    "gu": "dongnam",
+    "isatipsSlug": "cheonan-dongnam-sinan-dong-moving"
+  },
+  {
+    "slug": "seobuk-seonghwan-eup",
+    "name": "성환읍",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-seonghwan-eup-moving"
+  },
+  {
+    "slug": "seobuk-seonggeo-eup",
+    "name": "성거읍",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-seonggeo-eup-moving"
+  },
+  {
+    "slug": "seobuk-jiksan-eup",
+    "name": "직산읍",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-jiksan-eup-moving"
+  },
+  {
+    "slug": "seobuk-ipjang-myeon",
+    "name": "입장면",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-ipjang-myeon-moving"
+  },
+  {
+    "slug": "seobuk-seongjeong-1-dong",
+    "name": "성정1동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-seongjeong-1-dong-moving"
+  },
+  {
+    "slug": "seobuk-seongjeong-2-dong",
+    "name": "성정2동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-seongjeong-2-dong-moving"
+  },
+  {
+    "slug": "seobuk-ssangyong-1-dong",
+    "name": "쌍용1동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-ssangyong-1-dong-moving"
+  },
+  {
+    "slug": "seobuk-ssangyong-2-dong",
+    "name": "쌍용2동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-ssangyong-2-dong-moving"
+  },
+  {
+    "slug": "seobuk-ssangyong-3-dong",
+    "name": "쌍용3동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-ssangyong-3-dong-moving"
+  },
+  {
+    "slug": "seobuk-baekseok-dong",
+    "name": "백석동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-baekseok-dong-moving"
+  },
+  {
+    "slug": "seobuk-buldang-1-dong",
+    "name": "불당1동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-buldang-1-dong-moving"
+  },
+  {
+    "slug": "seobuk-buldang-2-dong",
+    "name": "불당2동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-buldang-2-dong-moving"
+  },
+  {
+    "slug": "seobuk-buseong-1-dong",
+    "name": "부성1동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-buseong-1-dong-moving"
+  },
+  {
+    "slug": "seobuk-buseong-2-dong",
+    "name": "부성2동",
+    "gu": "seobuk",
+    "isatipsSlug": "cheonan-seobuk-buseong-2-dong-moving"
+  }
+]
