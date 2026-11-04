@@ -6,11 +6,11 @@
   "workers_dev": false,
   "preview_urls": false,
   "observability": { "enabled": true },
-  "placement": { "region": "aws:ap-northeast-2" },
+  "placement": { "region": "gcp:asia-northeast3" },
   "routes": [{ "pattern": "local.bizhelp.kr/*", "zone_name": "bizhelp.kr" }],
   "triggers": { "crons": ["*/30 * * * *"] },
   "d1_databases": [
-    { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000" }
+    { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000", "remote": true }
   ],
-  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media", "remote": true }]
 }
