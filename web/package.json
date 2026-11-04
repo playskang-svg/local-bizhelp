@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/",
-    "dev": "wrangler dev --local --persist-to ../cms/.wrangler/state"
+    "dev": "wrangler dev --persist-to ../cms/.wrangler/state"
   },
   "devDependencies": {
     "wrangler": "^4.157.0"

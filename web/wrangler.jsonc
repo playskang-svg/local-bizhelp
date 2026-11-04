@@ -10,7 +10,7 @@
   "routes": [{ "pattern": "local.bizhelp.kr/*", "zone_name": "bizhelp.kr" }],
   "triggers": { "crons": ["*/30 * * * *"] },
   "d1_databases": [
-    { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000", "remote": true }
+    { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000" }
   ],
-  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media", "remote": true }]
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
 }
