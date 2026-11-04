@@ -12,5 +12,6 @@
   "d1_databases": [
     { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000" }
   ],
+  "ratelimits": [{ "name": "LIMIT", "namespace_id": "4001", "simple": { "limit": 10, "period": 60 } }],
   "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
 }

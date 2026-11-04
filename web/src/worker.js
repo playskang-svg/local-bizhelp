@@ -1,6 +1,8 @@
 import { page, cleanSrc } from './html.js';
 import { home } from './pages/home.js';
 import { dong } from './pages/dong.js';
+import { start } from './pages/start.js';
+import { claimVerify, claimConfirm } from './lib/claim.js';
 
 const notFound = () => page({
   title: '페이지를 찾을 수 없어요', desc: '', status: 404, noindex: true,
@@ -9,6 +11,9 @@ const notFound = () => page({
 
 // Route table: [regex, handler(env, match, src)]. Handler returns Response or null (-> 404). Later tasks append rows.
 const ROUTES = [
+  [/^\/start\/?$/, (env) => start(env)],
+  [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
+  [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
   [/^\/$/, (env, m, src) => home(env, src)],
   [/^\/d\/([a-z0-9-]+)\/?$/, (env, m, src) => dong(env, m[1], null, src)],
   [/^\/d\/([a-z0-9-]+)\/([a-z]+)\/?$/, (env, m, src) => dong(env, m[1], m[2], src)],
@@ -20,7 +25,7 @@ export default {
     const src = cleanSrc(url.searchParams.get('src'));
     for (const [re, fn] of ROUTES) {
       const m = url.pathname.match(re);
-      if (m) return (await fn(env, m, src)) ?? notFound();
+      if (m) return (await fn(env, m, src, req)) ?? notFound();
     }
     return notFound();
   },
