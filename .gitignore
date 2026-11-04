@@ -6,3 +6,8 @@ worker-dist/
 .superpowers/
 .dev.vars
 *.tgz
+
+.env
+.env*.local
+*.tsbuildinfo
+next-env.d.ts

@@ -1,0 +1,28 @@
+# Builds the Worker on Linux because OpenNext path patches do not work on Windows.
+# Deploy locally: pnpm deploy:ci (downloads this artifact, then runs wrangler deploy).
+name: Build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: { group: build, cancel-in-progress: true }
+permissions: { contents: read }
+jobs:
+  build:
+    defaults: { run: { working-directory: cms } }
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: corepack enable && corepack prepare pnpm@12.5.1 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/build.mjs
+      - run: pnpm exec wrangler deploy --dry-run --outdir worker-dist
+      - run: tar -czf open-next.tgz .open-next/assets worker-dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-next
+          path: cms/open-next.tgz
+          retention-days: 3
