@@ -56,6 +56,7 @@ export async function claimVerify(req, env) {
   const phoneHash = await hash(d.phone, env.OTP_PEPPER);
   const now = Date.now();
   const iso = new Date(now).toISOString();
+  // sweep of expired otps rows (expires_at < now) goes into the Task 7 cron
   await env.D1.prepare('DELETE FROM otps WHERE phone_hash = ? AND purpose = ?').bind(phoneHash, 'claim').run();
   const ins = await env.D1.prepare(
     'INSERT INTO otps (phone_hash, code_hash, purpose, payload, expires_at, attempts, created_at, updated_at) VALUES (?,?,?,?,?,0,?,?)',
@@ -95,19 +96,22 @@ export async function claimConfirm(req, env) {
 
   const p = JSON.parse(row.payload);
   const dr = await env.D1.prepare('SELECT id, slug FROM dongs WHERE slug = ?').bind(p.dong).first();
-  const dup = await env.D1.prepare('SELECT 1 AS x FROM businesses WHERE name = ? AND dong_id = ? AND trade = ? AND claimed = 1 LIMIT 1').bind(p.name, dr.id, p.trade).first();
+  const dup = await env.D1.prepare('SELECT id FROM businesses WHERE name = ? AND dong_id = ? AND trade = ? AND claimed = 1 LIMIT 1').bind(p.name, dr.id, p.trade).first();
   const verdict = decideClaim({ existingClaimed: !!dup });
   const iso = new Date().toISOString();
   const rand = [...crypto.getRandomValues(new Uint8Array(6))].map((n) => (n % 36).toString(36)).join('');
   const slug = `${dr.slug}-${p.trade}-${rand}`;
   const token = verdict === 'create' ? newToken() : null;
+  const mk = (biz) => env.D1.prepare('INSERT INTO landings (business_id, slug, status, biz_no, biz_verified_at, owner_phone, phone_verified_at, content, areas, edit_token_hash, billing, created_at, updated_at) VALUES (' + biz + ',?,?,?,?,?,?,?,?,?,?,?,?)');
+  const vals = (hashed) => [slug, verdict === 'create' ? 'draft' : 'held', p.bNo, iso, p.phone, iso, JSON.stringify({ name: p.name }), JSON.stringify([p.dong]), hashed, 'none', iso, iso];
+  // held: reuse the existing claimed business, no new businesses row
+  if (verdict === 'held') {
+    await mk('?').bind(dup.id, ...vals(null)).run();
+    return json({ held: true });
+  }
   await env.D1.batch([
-    env.D1.prepare('INSERT INTO businesses (name, trade, dong_id, source, claimed, created_at, updated_at) VALUES (?,?,?,?,?,?,?)')
-      .bind(p.name, p.trade, dr.id, 'self', verdict === 'create' ? 1 : 0, iso, iso),
-    env.D1.prepare(`INSERT INTO landings (business_id, slug, status, biz_no, biz_verified_at, owner_phone, phone_verified_at, content, areas, edit_token_hash, billing, created_at, updated_at)
-      VALUES (last_insert_rowid(),?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(slug, verdict === 'create' ? 'draft' : 'held', p.bNo, iso, p.phone, iso, JSON.stringify({ name: p.name }), JSON.stringify([p.dong]),
-        token ? await tokenHash(token) : null, 'none', iso, iso),
+    env.D1.prepare('INSERT INTO businesses (name, trade, dong_id, source, claimed, created_at, updated_at) VALUES (?,?,?,?,?,?,?)').bind(p.name, p.trade, dr.id, 'self', 1, iso, iso),
+    mk('last_insert_rowid()').bind(...vals(await tokenHash(token))),
   ]);
-  return verdict === 'create' ? json({ editUrl: `/edit/${token}` }) : json({ held: true });
+  return json({ editUrl: `/edit/${token}` });
 }
