@@ -4,7 +4,7 @@ import { applyUpdate, nextQuestion } from '../src/lib/landing-draft.js';
 
 test('ignores unknown keys and non-https urls', () => {
   const { draft } = applyUpdate({}, { evil: 1, channels: { instagram: 'javascript:alert(1)', blog: 'https://b.kr' } });
-  assert.equal(draft.evil, undefined); assert.equal(draft.channels.instagram, undefined); assert.equal(draft.channels.blog, 'https://b.kr');
+  assert.equal(draft.evil, undefined); assert.equal(draft.channels.instagram, undefined); assert.equal(draft.channels.blog, 'https://b.kr/');
 });
 test('areas keep only known dong slugs', () => {
   assert.deepEqual(applyUpdate({}, { areas: ['dongnam-mokcheon-eup', 'seoul-gangnam'] }).areas, ['dongnam-mokcheon-eup']);

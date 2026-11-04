@@ -19,7 +19,7 @@ const CLIENT = `
     if (j.preview !== undefined) $('preview').innerHTML = j.preview; // server-escaped HTML
     if (j.status === 'held') { $('publishBox').hidden = true; $('heldBox').hidden = false; $('chatForm').hidden = true; }
     else { $('publishBox').hidden = false; $('heldBox').hidden = true; }
-    if (j.status === 'published') $('pubBtn').textContent = '변경 내용 다시 공개하기';
+    if (j.status === 'published') $('pubBtn').textContent = '확인했어요';
     if (j.gameConsent) $('consent').checked = true;
   }
   function noToken() { $('app').hidden = true; $('relink').hidden = false; }
@@ -34,11 +34,11 @@ const CLIENT = `
     e.preventDefault();
     var msg = $('msg').value.trim(); if (!msg) return;
     $('msg').value = ''; say('me', msg); $('send').disabled = true;
-    post('/api/landing/chat', { token: token, message: msg, history: turns.slice(-12) }).then(function (r) {
+    post('/api/landing/chat', { token: token, message: msg, history: turns.slice(-24) }).then(function (r) {
       $('send').disabled = false;
       var reply = r.j.reply || r.j.error || '잠깐 문제가 생겼어요. 다시 말씀해 주세요';
       say('bot', reply);
-      if (r.ok) { turns.push({ role: 'user', content: msg }, { role: 'assistant', content: reply }); show(r.j); }
+      if (r.ok && !r.j.failed) { turns.push({ role: 'user', content: msg }, { role: 'assistant', content: reply }); show(r.j); }
     }, function () { $('send').disabled = false; say('bot', '잠깐 문제가 생겼어요. 다시 말씀해 주세요'); });
   });
   $('photo').addEventListener('change', function () {
@@ -49,10 +49,12 @@ const CLIENT = `
       .then(function (r) { say('bot', r.ok ? '사진을 올렸어요.' : r.j.error); if (r.ok) show(r.j); $('photo').value = ''; });
   });
   $('pubBtn').addEventListener('click', function () {
+    var live = $('pubBtn').textContent === '확인했어요';
     $('pubBtn').disabled = true;
     post('/api/landing/publish', { token: token, gameConsent: $('consent').checked }).then(function (r) {
       $('pubBtn').disabled = false;
-      $('pubMsg').textContent = r.ok ? '공개했어요.' : r.j.error;
+      $('pubMsg').textContent = r.ok ? (live ? '확인했어요.' : '공개했어요.') : r.j.error;
+      if (r.ok) $('pubBtn').textContent = '확인했어요';
     });
   });
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -74,7 +76,7 @@ const CLIENT = `
   });
   $('rlConfirm').addEventListener('click', function () {
     post('/api/edit-link', { handle: handle, code: $('rlCode').value }).then(function (r) {
-      if (r.ok) { location.href = r.j.editUrl; } else { $('rlMsg').textContent = r.j.error; }
+      if (r.ok) { location.href = r.j.editUrl; location.reload(); } else { $('rlMsg').textContent = r.j.error; }
     });
   });
 })();`;
