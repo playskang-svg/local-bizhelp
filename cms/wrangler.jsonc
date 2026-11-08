@@ -20,9 +20,10 @@
     {
       "binding": "D1",
       "database_name": "localbridge",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "5b078ed9-3c91-45fc-9e9a-154a9c702e86",
       "remote": true
     }
   ],
-  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media", "remote": true }]
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media", "remote": true }],
+  "vars": { "TRACK_A_START": "2026-10-19" }
 }

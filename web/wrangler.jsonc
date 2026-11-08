@@ -7,10 +7,10 @@
   "preview_urls": false,
   "observability": { "enabled": true },
   "placement": { "region": "gcp:asia-northeast3" },
-  "routes": [{ "pattern": "local.bizhelp.kr/*", "zone_name": "bizhelp.kr" }],
+  "routes": [{ "pattern": "local.bizhelp.kr", "custom_domain": true }],
   "triggers": { "crons": ["*/30 * * * *"] },
   "d1_databases": [
-    { "binding": "D1", "database_name": "localbridge", "database_id": "00000000-0000-0000-0000-000000000000" }
+    { "binding": "D1", "database_name": "localbridge", "database_id": "5b078ed9-3c91-45fc-9e9a-154a9c702e86" }
   ],
   "ratelimits": [{ "name": "LIMIT", "namespace_id": "4001", "simple": { "limit": 10, "period": 60 } }],
   "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
