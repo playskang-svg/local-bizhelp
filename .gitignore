@@ -11,3 +11,6 @@ worker-dist/
 .env*.local
 *.tsbuildinfo
 next-env.d.ts
+
+# design docs stay local (personal info)
+docs/
