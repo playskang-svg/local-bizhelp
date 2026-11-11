@@ -18,6 +18,6 @@
   "assets": { "directory": "./public" },
   // CONSULT_PHONE: 넣으면 '체크하고 문자 보내기' + 전화 버튼, 비우면 '견적 받기'(링크프라이스 딥링크).
   // LINKPRICE_SITE: 링크프라이스에 등록한 이 사이트의 코드(A로 시작). shared/soomgo-deeplinks.json 에 발급 링크가 있으면 그쪽이 우선.
-  "vars": { "CONSULT_PHONE": "", "LINKPRICE_SITE": "" },
+  "vars": { "CONSULT_PHONE": "", "LINKPRICE_SITE": "A100709867" },
   "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
 }

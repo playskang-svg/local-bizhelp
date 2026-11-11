@@ -5,6 +5,7 @@ import worker from '../src/worker.js';
 import { GROUPS, REGIONS, regionOf, groupOf } from '../src/kw/data.js';
 import { composePage, sectionOrder, josa } from '../src/kw/compose.js';
 import { validateLead } from '../src/lib/lead.js';
+import { deepLink } from '../src/kw/contact.js';
 
 const env = () => ({ D1: makeD1(), CONSULT_PHONE: '010-1234-5678' });
 const get = (e, path) => worker.fetch(new Request('https://local.bizhelp.kr' + path), e);
@@ -96,16 +97,22 @@ test('sitemap lists every keyword page and area page', async () => {
 });
 
 test('no phone: 견적 받기 mode with per-work deep links, no service name on screen', async () => {
+  // 발급 링크(shared/soomgo-deeplinks.json, 사이트 A100709867)가 LINKPRICE_SITE 보다 우선한다
   const e = { D1: makeD1(), LINKPRICE_SITE: 'A100000001' };
   const h = await (await get(e, '/dobae-jangpan/buldang-1-dong')).text();
   assert.ok(h.includes('체크하고 견적 받기') && !h.includes('href="sms:'));
-  assert.ok(h.includes('https://lpweb.kr/click.php?m=soomgo&amp;a=A100000001'));
+  assert.ok(h.includes('https://lpweb.kr/click.php?m=soomgo&amp;a=A100709867'));
+  assert.ok(!h.includes('A100000001'));
   assert.ok(h.includes(encodeURIComponent('https://soomgo.com/hire/장판-시공')));
   assert.ok(h.includes('rel="sponsored noopener"') && h.includes('수수료'));
   const text = h.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
   assert.ok(!/숨고|고수/.test(text));
-  const none = await (await get({ D1: makeD1() }, '/dobae-jangpan/buldang-1-dong')).text();
-  assert.ok(!none.includes('id="picker"') && !none.includes('class="fixbar"'));
+  // 발급분이 없는 항목: 사이트 코드가 있으면 같은 형식으로 만들고, 없으면 빈 값(상담 칸 숨김)
+  assert.match(deepLink('A100000001', '없는-항목'), /a=A100000001/);
+  assert.equal(deepLink('', '없는-항목'), '');
+  // 번호를 넣으면 문자 모드
+  const sms = await (await get({ D1: makeD1(), CONSULT_PHONE: '010-1234-5678' }, '/dobae-jangpan/buldang-1-dong')).text();
+  assert.ok(sms.includes('체크하고 문자 보내기') && sms.includes('href="tel:01012345678"'));
   const closest = await (await get(e, '/gyedan-suri/sinbang-dong')).text();
   assert.ok(closest.includes('가장 가까운'));
 });
