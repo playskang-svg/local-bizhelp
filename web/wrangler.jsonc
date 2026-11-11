@@ -10,8 +10,13 @@
   "routes": [{ "pattern": "local.bizhelp.kr", "custom_domain": true }],
   "triggers": { "crons": ["*/30 * * * *"] },
   "d1_databases": [
-    { "binding": "D1", "database_name": "localbridge", "database_id": "5b078ed9-3c91-45fc-9e9a-154a9c702e86" }
+    // migrations: web 전용 테이블(kw_leads). Payload 마이그레이션과 섞이지 않게 표를 따로 쓴다.
+    { "binding": "D1", "database_name": "localbridge", "database_id": "5b078ed9-3c91-45fc-9e9a-154a9c702e86", "migrations_dir": "migrations", "migrations_table": "web_d1_migrations" }
   ],
   "ratelimits": [{ "name": "LIMIT", "namespace_id": "4001", "simple": { "limit": 10, "period": 60 } }],
+  // 정적 파일(키워드 사진 /ba/, /img/): 파일이 있으면 워커를 거치지 않고 바로 나간다
+  "assets": { "directory": "./public" },
+  // 문자 상담을 받을 번호. 비우면 문자 앱이 받는 사람 없이 열린다.
+  "vars": { "CONSULT_PHONE": "" },
   "r2_buckets": [{ "binding": "R2", "bucket_name": "localbridge-media" }]
 }

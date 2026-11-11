@@ -72,7 +72,8 @@ export default buildConfig({
     user: Users.slug,
     components: {
       afterNavLinks: ['/views/MetricsLink'],
-      views: { metrics: { Component: '/views/Metrics', path: '/metrics' } },
+      // 첫 화면을 관리 허브(키워드 그룹·사진·문자 상담)로 바꾼다. 컬렉션 목록은 왼쪽 메뉴에 그대로 있다.
+      views: { dashboard: { Component: '/views/Hub' }, metrics: { Component: '/views/Metrics', path: '/metrics' } },
     },
     importMap: {
       baseDir: path.resolve(dirname),

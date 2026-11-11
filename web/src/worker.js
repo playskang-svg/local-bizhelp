@@ -1,5 +1,9 @@
-import { page, cleanSrc, esc } from './html.js';
+import { page, cleanSrc, esc, ORIGIN } from './html.js';
 import { home } from './pages/home.js';
+import { regionPage, hubPage, areaPage, allPaths } from './kw/render.js';
+import { groupOf, regionOf } from './kw/data.js';
+import { kwShops } from './kw/shops.js';
+import { submitLead } from './lib/lead.js';
 import { privacy } from './pages/privacy.js';
 import { dong } from './pages/dong.js';
 import { start } from './pages/start.js';
@@ -15,7 +19,7 @@ const notFound = () => page({
   body: '<h1>페이지를 찾을 수 없어요</h1><p class="lead">주소를 다시 확인해 주세요.</p><a class="btn" href="/">처음으로</a>',
 });
 
-const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/admin', '/cms-api'].map((p) => `Disallow: ${p}`), 'Sitemap: https://local.bizhelp.kr/sitemap.xml', ''].join('\n');
+const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/admin', '/cms-api', '/go'].map((p) => `Disallow: ${p}`), 'Sitemap: https://local.bizhelp.kr/sitemap.xml', ''].join('\n');
 
 // Route table: [regex, handler(env, match, src)]. Handler returns Response or null (-> 404). Later tasks append rows.
 const ROUTES = [
@@ -38,12 +42,27 @@ const ROUTES = [
   [/^\/robots\.txt$/, () => new Response(ROBOTS, { headers: { 'content-type': 'text/plain; charset=utf-8' } })],
   [/^\/sitemap\.xml$/, async (env) => {
     const rows = (await env.D1.prepare("SELECT slug, updated_at FROM landings WHERE status = 'published' ORDER BY id").all()).results;
-    const urls = '<url><loc>https://local.bizhelp.kr/</loc></url>' + rows.map((r) => `<url><loc>https://local.bizhelp.kr/p/${esc(r.slug)}</loc>${r.updated_at ? `<lastmod>${esc(r.updated_at)}</lastmod>` : ""}</url>`).join('');
+    const loc = (p, lastmod) => `<url><loc>${ORIGIN}${esc(p)}</loc>${lastmod ? `<lastmod>${esc(lastmod)}</lastmod>` : ''}</url>`;
+    const urls = loc('/') + allPaths().map((p) => loc(p)).join('') + rows.map((r) => loc(`/p/${r.slug}`, r.updated_at)).join('');
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
   }],
+  [/^\/api\/lead$/, (env, m, src, req) => submitLead(req, env)],
+  // 검색창(자바스크립트 없이 제출한 경우)
+  [/^\/go$/, (env, m, src, req) => {
+    const q = new URL(req.url).searchParams;
+    const g = groupOf(q.get('k') || ''), r = regionOf(q.get('r') || '');
+    return g ? Response.redirect(`${ORIGIN}/${g.slug}${r ? `/${r.slug}` : ''}`, 302) : Response.redirect(`${ORIGIN}/`, 302);
+  }],
+  [/^\/area\/([a-z0-9-]+)\/?$/, async (env, m, src) => { const r = regionOf(m[1]); return r ? areaPage(env, r, src, await kwShops(env, r)) : null; }],
   [/^\/$/, (env, m, src) => home(env, src)],
   [/^\/d\/([a-z0-9-]+)\/?$/, (env, m, src) => dong(env, m[1], null, src)],
   [/^\/d\/([a-z0-9-]+)\/([a-z]+)\/?$/, (env, m, src) => dong(env, m[1], m[2], src)],
+  // 키워드 허브와 키워드 × 지역 페이지 — 위 고정 경로와 겹치지 않는 슬러그만 그룹으로 인정된다
+  [/^\/([a-z0-9-]+)\/?$/, (env, m, src) => { const g = groupOf(m[1]); return g ? hubPage(env, g, src) : null; }],
+  [/^\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/, async (env, m, src) => {
+    const g = groupOf(m[1]), r = regionOf(m[2]);
+    return g && r ? regionPage(env, g, r, src, await kwShops(env, r)) : null;
+  }],
 ];
 
 export default {

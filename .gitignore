@@ -14,3 +14,6 @@ next-env.d.ts
 
 # design docs stay local (personal info)
 docs/
+
+# suriwiki 전후 사진 (38MB) — node scripts/import-suriwiki.mjs 로 다시 받는다
+web/public/ba/

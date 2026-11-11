@@ -5,6 +5,8 @@ import fs from 'node:fs';
 export function makeD1() {
   const db = new DatabaseSync(':memory:');
   db.exec(fs.readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));
+  const mig = new URL('../../migrations/', import.meta.url);
+  for (const f of fs.readdirSync(mig).sort()) db.exec(fs.readFileSync(new URL(f, mig), 'utf8'));
   const stmt = (sql, args = []) => ({
     sql, args,
     bind: (...a) => stmt(sql, a),

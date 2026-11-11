@@ -1,0 +1,1107 @@
+{
+ "_source": "위키백과 「천안시의 행정 구역」 2024-01-01 기준 표(2026-11-11 조회). 불당1·2동 합계 {\"population\":70330,\"households\":25910}",
+ "buldangTotal": {
+  "population": 70330,
+  "households": 25910
+ },
+ "regions": [
+  {
+   "slug": "cheonan",
+   "name": "천안",
+   "full": "천안시",
+   "level": "si",
+   "gu": null,
+   "parent": null,
+   "type": "mixed",
+   "population": 676996,
+   "households": 291425,
+   "legal": []
+  },
+  {
+   "slug": "dongnam-gu",
+   "name": "동남구",
+   "full": "천안시 동남구",
+   "level": "gu",
+   "gu": "dongnam",
+   "parent": "cheonan",
+   "type": "mixed",
+   "population": 265917,
+   "households": 115586,
+   "legal": []
+  },
+  {
+   "slug": "seobuk-gu",
+   "name": "서북구",
+   "full": "천안시 서북구",
+   "level": "gu",
+   "gu": "seobuk",
+   "parent": "cheonan",
+   "type": "mixed",
+   "population": 411079,
+   "households": 175839,
+   "legal": []
+  },
+  {
+   "slug": "mokcheon-eup",
+   "name": "목천읍",
+   "full": "천안시 동남구 목천읍",
+   "level": "eup",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 24800,
+   "households": 11039,
+   "legal": [
+    "서리",
+    "동리",
+    "교촌리",
+    "남화리",
+    "동평리",
+    "운전리",
+    "신계리",
+    "천정리",
+    "교천리",
+    "지산리",
+    "서흥리",
+    "덕전리",
+    "송전리",
+    "석천리",
+    "응원리",
+    "삼성리",
+    "도장리",
+    "소사리"
+   ]
+  },
+  {
+   "slug": "pungse-myeon",
+   "name": "풍세면",
+   "full": "천안시 동남구 풍세면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 4409,
+   "households": 2119,
+   "legal": [
+    "풍서리",
+    "보성리",
+    "가송리",
+    "두남리",
+    "미죽리",
+    "남관리",
+    "삼태리",
+    "용정리"
+   ]
+  },
+  {
+   "slug": "gwangdeok-myeon",
+   "name": "광덕면",
+   "full": "천안시 동남구 광덕면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 4471,
+   "households": 2349,
+   "legal": [
+    "신흥리",
+    "대덕리",
+    "매당리",
+    "무학리",
+    "광덕리",
+    "보산원리",
+    "지장리",
+    "신덕리",
+    "행정리",
+    "대평리",
+    "원덕리"
+   ]
+  },
+  {
+   "slug": "buk-myeon",
+   "name": "북면",
+   "full": "천안시 동남구 북면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 4526,
+   "households": 2412,
+   "legal": [
+    "연춘리",
+    "상동리",
+    "용암리",
+    "은지리",
+    "매송리",
+    "명덕리",
+    "오곡리",
+    "사담리",
+    "전곡리",
+    "양곡리",
+    "납안리",
+    "운용리",
+    "대평리"
+   ]
+  },
+  {
+   "slug": "seongnam-myeon",
+   "name": "성남면",
+   "full": "천안시 동남구 성남면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 3777,
+   "households": 1663,
+   "legal": [
+    "용원리",
+    "신사리",
+    "대화리",
+    "화성리",
+    "석곡리",
+    "대정리",
+    "대흥리",
+    "신덕리",
+    "봉양리"
+   ]
+  },
+  {
+   "slug": "susin-myeon",
+   "name": "수신면",
+   "full": "천안시 동남구 수신면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 2709,
+   "households": 1302,
+   "legal": [
+    "속창리",
+    "신풍리",
+    "장산리",
+    "해정리",
+    "발산리",
+    "백자리"
+   ]
+  },
+  {
+   "slug": "byeongcheon-myeon",
+   "name": "병천면",
+   "full": "천안시 동남구 병천면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 6440,
+   "households": 3363,
+   "legal": [
+    "병천리",
+    "가전리",
+    "탑원리",
+    "용두리",
+    "송정리",
+    "도원리",
+    "관성리",
+    "매성리",
+    "봉항리"
+   ]
+  },
+  {
+   "slug": "dong-myeon",
+   "name": "동면",
+   "full": "천안시 동남구 동면",
+   "level": "myeon",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "rural",
+   "population": 2374,
+   "households": 1170,
+   "legal": [
+    "화계리",
+    "광덕리",
+    "구도리",
+    "송연리",
+    "동산리",
+    "행암리",
+    "덕성리",
+    "죽계리",
+    "장송리",
+    "수남리",
+    "화덕리"
+   ]
+  },
+  {
+   "slug": "jungang-dong",
+   "name": "중앙동",
+   "full": "천안시 동남구 중앙동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "old",
+   "population": 5761,
+   "households": 3205,
+   "legal": [
+    "대흥동",
+    "오룡동",
+    "사직동",
+    "영성동"
+   ]
+  },
+  {
+   "slug": "munseong-dong",
+   "name": "문성동",
+   "full": "천안시 동남구 문성동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "old",
+   "population": 3889,
+   "households": 2259,
+   "legal": [
+    "문화동",
+    "성황동"
+   ]
+  },
+  {
+   "slug": "wonseong-1-dong",
+   "name": "원성1동",
+   "full": "천안시 동남구 원성1동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "old",
+   "population": 9033,
+   "households": 4259,
+   "legal": [
+    "원성동",
+    "유량동"
+   ]
+  },
+  {
+   "slug": "wonseong-2-dong",
+   "name": "원성2동",
+   "full": "천안시 동남구 원성2동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "old",
+   "population": 9675,
+   "households": 4875,
+   "legal": [
+    "원성동"
+   ]
+  },
+  {
+   "slug": "bongmyeong-dong",
+   "name": "봉명동",
+   "full": "천안시 동남구 봉명동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "apt",
+   "population": 18690,
+   "households": 9106,
+   "legal": [
+    "봉명동",
+    "쌍용동"
+   ]
+  },
+  {
+   "slug": "ilbong-dong",
+   "name": "일봉동",
+   "full": "천안시 동남구 일봉동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "apt",
+   "population": 24131,
+   "households": 8890,
+   "legal": [
+    "다가동",
+    "용곡동"
+   ]
+  },
+  {
+   "slug": "sinbang-dong",
+   "name": "신방동",
+   "full": "천안시 동남구 신방동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "apt",
+   "population": 45671,
+   "households": 18345,
+   "legal": [
+    "신방동",
+    "용곡동"
+   ]
+  },
+  {
+   "slug": "cheongryong-dong",
+   "name": "청룡동",
+   "full": "천안시 동남구 청룡동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "mixed",
+   "population": 56531,
+   "households": 21515,
+   "legal": [
+    "청수동",
+    "청당동",
+    "구성동",
+    "삼룡동",
+    "구룡동"
+   ]
+  },
+  {
+   "slug": "sinan-dong",
+   "name": "신안동",
+   "full": "천안시 동남구 신안동",
+   "level": "dong",
+   "gu": "dongnam",
+   "parent": "dongnam-gu",
+   "type": "campus",
+   "population": 39030,
+   "households": 17715,
+   "legal": [
+    "신부동",
+    "안서동"
+   ]
+  },
+  {
+   "slug": "seonghwan-eup",
+   "name": "성환읍",
+   "full": "천안시 서북구 성환읍",
+   "level": "eup",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "rural",
+   "population": 26436,
+   "households": 11267,
+   "legal": [
+    "성환리",
+    "성월리",
+    "매주리",
+    "율금리",
+    "왕림리",
+    "신방리",
+    "송덕리",
+    "우신리",
+    "어룡리",
+    "복모리",
+    "신가리",
+    "와룡리",
+    "대홍리",
+    "수향리",
+    "안궁리",
+    "양령리",
+    "도하리",
+    "학정리"
+   ]
+  },
+  {
+   "slug": "seonggeo-eup",
+   "name": "성거읍",
+   "full": "천안시 서북구 성거읍",
+   "level": "eup",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "rural",
+   "population": 22670,
+   "households": 9594,
+   "legal": [
+    "천흥리",
+    "송남리",
+    "오목리",
+    "오색당리",
+    "저리",
+    "모전리",
+    "삼곡리",
+    "정촌리",
+    "문덕리",
+    "석교리",
+    "요방리",
+    "소우리",
+    "신월리"
+   ]
+  },
+  {
+   "slug": "jiksan-eup",
+   "name": "직산읍",
+   "full": "천안시 서북구 직산읍",
+   "level": "eup",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "rural",
+   "population": 21155,
+   "households": 9364,
+   "legal": [
+    "군동리",
+    "군서리",
+    "남산리",
+    "판정리",
+    "수헐리",
+    "삼은리",
+    "상덕리",
+    "부송리",
+    "모시리",
+    "자은가리",
+    "양당리",
+    "신갈리",
+    "마정리",
+    "석곡리"
+   ]
+  },
+  {
+   "slug": "ipjang-myeon",
+   "name": "입장면",
+   "full": "천안시 서북구 입장면",
+   "level": "myeon",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "rural",
+   "population": 9664,
+   "households": 4452,
+   "legal": [
+    "하장리",
+    "상장리",
+    "기로리",
+    "도림리",
+    "양대리",
+    "홍천리",
+    "호당리",
+    "시장리",
+    "효계리",
+    "신덕리",
+    "신두리",
+    "용정리",
+    "흑암리",
+    "산정리",
+    "연곡리",
+    "가산리",
+    "유리",
+    "독정리"
+   ]
+  },
+  {
+   "slug": "seongjeong-1-dong",
+   "name": "성정1동",
+   "full": "천안시 서북구 성정1동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 16671,
+   "households": 8838,
+   "legal": [
+    "성정동",
+    "와촌동"
+   ]
+  },
+  {
+   "slug": "seongjeong-2-dong",
+   "name": "성정2동",
+   "full": "천안시 서북구 성정2동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 26487,
+   "households": 17001,
+   "legal": [
+    "성정동"
+   ]
+  },
+  {
+   "slug": "ssangyong-1-dong",
+   "name": "쌍용1동",
+   "full": "천안시 서북구 쌍용1동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 14197,
+   "households": 6218,
+   "legal": [
+    "쌍용동"
+   ]
+  },
+  {
+   "slug": "ssangyong-2-dong",
+   "name": "쌍용2동",
+   "full": "천안시 서북구 쌍용2동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 38400,
+   "households": 14580,
+   "legal": [
+    "쌍용동"
+   ]
+  },
+  {
+   "slug": "ssangyong-3-dong",
+   "name": "쌍용3동",
+   "full": "천안시 서북구 쌍용3동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 19185,
+   "households": 7984,
+   "legal": [
+    "쌍용동"
+   ]
+  },
+  {
+   "slug": "baekseok-dong",
+   "name": "백석동",
+   "full": "천안시 서북구 백석동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 41058,
+   "households": 14305,
+   "legal": [
+    "백석동"
+   ]
+  },
+  {
+   "slug": "buldang-1-dong",
+   "name": "불당1동",
+   "full": "천안시 서북구 불당1동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": [
+    "불당동"
+   ]
+  },
+  {
+   "slug": "buldang-2-dong",
+   "name": "불당2동",
+   "full": "천안시 서북구 불당2동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": [
+    "불당동"
+   ]
+  },
+  {
+   "slug": "buseong-1-dong",
+   "name": "부성1동",
+   "full": "천안시 서북구 부성1동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "mixed",
+   "population": 46747,
+   "households": 22337,
+   "legal": [
+    "두정동",
+    "부대동",
+    "신당동",
+    "업성동"
+   ]
+  },
+  {
+   "slug": "buseong-2-dong",
+   "name": "부성2동",
+   "full": "천안시 서북구 부성2동",
+   "level": "dong",
+   "gu": "seobuk",
+   "parent": "seobuk-gu",
+   "type": "apt",
+   "population": 58079,
+   "households": 23989,
+   "legal": [
+    "두정동",
+    "성성동",
+    "차암동"
+   ]
+  },
+  {
+   "slug": "daeheung-dong",
+   "name": "대흥동",
+   "full": "천안시 동남구 대흥동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "jungang-dong",
+   "admins": [
+    "jungang-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "oryong-dong",
+   "name": "오룡동",
+   "full": "천안시 동남구 오룡동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "jungang-dong",
+   "admins": [
+    "jungang-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "sajik-dong",
+   "name": "사직동",
+   "full": "천안시 동남구 사직동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "jungang-dong",
+   "admins": [
+    "jungang-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "yeongseong-dong",
+   "name": "영성동",
+   "full": "천안시 동남구 영성동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "jungang-dong",
+   "admins": [
+    "jungang-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "munhwa-dong",
+   "name": "문화동",
+   "full": "천안시 동남구 문화동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "munseong-dong",
+   "admins": [
+    "munseong-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "seonghwang-dong",
+   "name": "성황동",
+   "full": "천안시 동남구 성황동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "munseong-dong",
+   "admins": [
+    "munseong-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "wonseong-dong",
+   "name": "원성동",
+   "full": "천안시 동남구 원성동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "wonseong-1-dong",
+   "admins": [
+    "wonseong-1-dong",
+    "wonseong-2-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "yuryang-dong",
+   "name": "유량동",
+   "full": "천안시 동남구 유량동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "wonseong-1-dong",
+   "admins": [
+    "wonseong-1-dong"
+   ],
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "ssangyong-dong",
+   "name": "쌍용동",
+   "full": "천안시 동남구 쌍용동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "bongmyeong-dong",
+   "admins": [
+    "bongmyeong-dong",
+    "ssangyong-1-dong",
+    "ssangyong-2-dong",
+    "ssangyong-3-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "daga-dong",
+   "name": "다가동",
+   "full": "천안시 동남구 다가동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "ilbong-dong",
+   "admins": [
+    "ilbong-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "yonggok-dong",
+   "name": "용곡동",
+   "full": "천안시 동남구 용곡동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "ilbong-dong",
+   "admins": [
+    "ilbong-dong",
+    "sinbang-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "cheongsu-dong",
+   "name": "청수동",
+   "full": "천안시 동남구 청수동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "cheongryong-dong",
+   "admins": [
+    "cheongryong-dong"
+   ],
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "cheongdang-dong",
+   "name": "청당동",
+   "full": "천안시 동남구 청당동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "cheongryong-dong",
+   "admins": [
+    "cheongryong-dong"
+   ],
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "guseong-dong",
+   "name": "구성동",
+   "full": "천안시 동남구 구성동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "cheongryong-dong",
+   "admins": [
+    "cheongryong-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "samryong-dong",
+   "name": "삼룡동",
+   "full": "천안시 동남구 삼룡동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "cheongryong-dong",
+   "admins": [
+    "cheongryong-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "guryong-dong",
+   "name": "구룡동",
+   "full": "천안시 동남구 구룡동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "cheongryong-dong",
+   "admins": [
+    "cheongryong-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "sinbu-dong",
+   "name": "신부동",
+   "full": "천안시 동남구 신부동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "sinan-dong",
+   "admins": [
+    "sinan-dong"
+   ],
+   "type": "campus",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "anseo-dong",
+   "name": "안서동",
+   "full": "천안시 동남구 안서동",
+   "level": "bdong",
+   "gu": "dongnam",
+   "parent": "sinan-dong",
+   "admins": [
+    "sinan-dong"
+   ],
+   "type": "campus",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "seongjeong-dong",
+   "name": "성정동",
+   "full": "천안시 서북구 성정동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "seongjeong-1-dong",
+   "admins": [
+    "seongjeong-1-dong",
+    "seongjeong-2-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "wachon-dong",
+   "name": "와촌동",
+   "full": "천안시 서북구 와촌동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "seongjeong-1-dong",
+   "admins": [
+    "seongjeong-1-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "buldang-dong",
+   "name": "불당동",
+   "full": "천안시 서북구 불당동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buldang-1-dong",
+   "admins": [
+    "buldang-1-dong",
+    "buldang-2-dong"
+   ],
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "dujeong-dong",
+   "name": "두정동",
+   "full": "천안시 서북구 두정동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-1-dong",
+   "admins": [
+    "buseong-1-dong",
+    "buseong-2-dong"
+   ],
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "budae-dong",
+   "name": "부대동",
+   "full": "천안시 서북구 부대동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-1-dong",
+   "admins": [
+    "buseong-1-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "sindang-dong",
+   "name": "신당동",
+   "full": "천안시 서북구 신당동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-1-dong",
+   "admins": [
+    "buseong-1-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "eopseong-dong",
+   "name": "업성동",
+   "full": "천안시 서북구 업성동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-1-dong",
+   "admins": [
+    "buseong-1-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "seongseong-dong",
+   "name": "성성동",
+   "full": "천안시 서북구 성성동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-2-dong",
+   "admins": [
+    "buseong-2-dong"
+   ],
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "chaam-dong",
+   "name": "차암동",
+   "full": "천안시 서북구 차암동",
+   "level": "bdong",
+   "gu": "seobuk",
+   "parent": "buseong-2-dong",
+   "admins": [
+    "buseong-2-dong"
+   ],
+   "type": "mixed",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "sin-buldang",
+   "name": "신불당",
+   "full": "천안시 서북구 불당동 신불당",
+   "level": "place",
+   "gu": "seobuk",
+   "parent": "buldang-dong",
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "dujeong-yeok",
+   "name": "두정역",
+   "full": "천안시 서북구 두정동 두정역",
+   "level": "place",
+   "gu": "seobuk",
+   "parent": "dujeong-dong",
+   "type": "apt",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "cheonan-yeok",
+   "name": "천안역",
+   "full": "천안시 동남구 대흥동 천안역",
+   "level": "place",
+   "gu": "dongnam",
+   "parent": "daeheung-dong",
+   "type": "old",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "cheonan-terminal",
+   "name": "천안터미널",
+   "full": "천안시 동남구 신부동 천안터미널",
+   "level": "place",
+   "gu": "dongnam",
+   "parent": "sinbu-dong",
+   "type": "campus",
+   "population": null,
+   "households": null,
+   "legal": []
+  },
+  {
+   "slug": "cheongsu-jigu",
+   "name": "청수지구",
+   "full": "천안시 동남구 청수동 청수지구",
+   "level": "place",
+   "gu": "dongnam",
+   "parent": "cheongsu-dong",
+   "type": "new",
+   "population": null,
+   "households": null,
+   "legal": []
+  }
+ ]
+}
