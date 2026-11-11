@@ -17,6 +17,7 @@ export function validateLead(b) {
     work: list(b.work, [...g.subs, '잘 모르겠어요']),
     symptom: list(b.symptom, [...(g.content.symptoms || []), '기타']),
     area: list(b.area, null, 7),
+    kind: b.kind === 'quote' ? 'quote' : 'sms',
     src: normalizeSrc(b.src),
   };
 }
@@ -26,7 +27,7 @@ export async function submitLead(req, env, now = Date.now()) {
   if (env.LIMIT && !(await env.LIMIT.limit({ key: `l:${req.headers.get('cf-connecting-ip') || 'local'}` })).success) return new Response(null, { status: 429 });
   const v = validateLead(await req.json().catch(() => null));
   if (!v) return new Response(null, { status: 400 });
-  await env.D1.prepare('INSERT INTO kw_leads (created_at, group_slug, region_slug, work, symptom, area, src) VALUES (?,?,?,?,?,?,?)')
-    .bind(new Date(now).toISOString(), v.group, v.region, JSON.stringify(v.work), JSON.stringify(v.symptom), JSON.stringify(v.area), v.src).run();
+  await env.D1.prepare('INSERT INTO kw_leads (created_at, group_slug, region_slug, work, symptom, area, src, kind) VALUES (?,?,?,?,?,?,?,?)')
+    .bind(new Date(now).toISOString(), v.group, v.region, JSON.stringify(v.work), JSON.stringify(v.symptom), JSON.stringify(v.area), v.src, v.kind).run();
   return new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } });
 }
