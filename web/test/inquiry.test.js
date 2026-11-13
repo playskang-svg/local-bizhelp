@@ -121,7 +121,7 @@ async function seedReminders(h) {
   const { post, sent, D1 } = h;
   for (const p of ['010-9999-0000', '010-1111-2222', '010-3333-4444', '010-5555-1111']) await post({ phone: p });
   const old = new Date(NOON - 13 * 3600e3).toISOString();
-  D1.db.exec(`UPDATE inquiries SET created_at='${old}', notified_at='${old}' WHERE id IN (1,2,3); UPDATE inquiries SET created_at='${new Date(NOON).toISOString()}' WHERE id=4`);
+  D1.db.exec(`UPDATE inquiries SET created_at='${old}', notified_at='${old}' WHERE id IN (1,2,3); UPDATE inquiries SET created_at='${new Date(NOON).toISOString()}', notified_at='${new Date(NOON).toISOString()}' WHERE id=4`);
   return sent.map((x) => ({ ...x }));
 }
 
