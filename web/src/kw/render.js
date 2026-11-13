@@ -1,7 +1,7 @@
 // 키워드 사이트 화면. suriwiki 키워드 사이트(bizhelp/scripts/page-template.mjs)의 구성 —
 // 히어로(+전후 사진) → 신뢰 띠 → 작업 항목 → 증상 → 전후 비교 → 유형 안내 → 진행 절차 → 지역 → FAQ → 체크하고 문자 보내기 —
 // 을 local.bizhelp.kr 한 도메인 안의 /<키워드>/<지역> 구조로 옮기고, 디자인은 새로 짰다.
-import { page, esc, jsonLd, withSrc, ORIGIN, SITE } from '../html.js';
+import { page, esc, jsonLd, withSrc, ORIGIN, SITE, BRAND, CITY } from '../html.js';
 import { GROUPS, REGIONS, GU_LABEL, LEVEL_LABEL, groupOf, regionOf, nearOf, kwPath, pagePath, areaPath, regionIndex, HERO } from './data.js';
 import { composePage, faqOf, sectionOrder, TEMPLATES, josa, factLine, coverageLine, hashCode, rotate } from './compose.js';
 import { BA } from './data.js';
@@ -118,7 +118,7 @@ const fixbar = (ct) => (hasContact(ct) ? `<div class="fixbar"><a class="btn btn-
 const crumbs = (items) => items.map(([n, h]) => (h ? `<a href="${esc(h)}">${esc(n)}</a>` : esc(n))).join('<span>›</span>');
 const breadcrumbLd = (items) => jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, path], i) => ({ '@type': 'ListItem', position: i + 1, name, item: ORIGIN + path })) });
 const faqLd = (faq) => jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) });
-const og = (title, desc, url, img) => `<meta property="og:type" content="website"><meta property="og:site_name" content="${esc(SITE)}"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(url)}">${img ? `<meta property="og:image" content="${esc(ORIGIN + img)}"><meta name="twitter:card" content="summary_large_image">` : ''}`;
+const og = (title, desc, url, img, site = SITE) => `<meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site)}"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(url)}">${img ? `<meta property="og:image" content="${esc(ORIGIN + img)}"><meta name="twitter:card" content="summary_large_image">` : ''}`;
 const verify = (env) => `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">${env?.SEO_NAVER_VERIFY ? `<meta name="naver-site-verification" content="${esc(env.SEO_NAVER_VERIFY)}">` : ''}${env?.SEO_GOOGLE_VERIFY ? `<meta name="google-site-verification" content="${esc(env.SEO_GOOGLE_VERIFY)}">` : ''}`;
 
 function shopsBlock(shops, r, src) {
@@ -136,7 +136,7 @@ export async function regionPage(env, g, r, src, shops = []) {
   const url = ORIGIN + pagePath(g, r);
   const title = `${name} | ${c.s1}·${c.s2} 사진 상담 - ${SITE}`;
   const desc = `${r.full} ${g.keyword} 상담. ${c.subs.slice(0, 3).join('·')} — 사진을 먼저 보고 가능 여부를 안내하고 ${r.name} 가까운 업체와 이어 드려요.`;
-  const items = [['천안 집수리', '/'], [g.keyword, kwPath(g)], [r.name, pagePath(g, r)]];
+  const items = [['천안 집수리', CITY], [g.keyword, kwPath(g)], [r.name, pagePath(g, r)]];
   const sec = {
     intro: () => `<section class="sec"><div class="sec-h"><span class="eyebrow">${esc(LEVEL_LABEL[r.level])} · ${esc(r.gu ? GU_LABEL[r.gu] : '천안시')}</span><h2>${esc(name)} 안내</h2></div>
 <div class="prose"><p class="facts">${esc(c.fact)}</p>${c.local.map((t) => `<p>${esc(t)}</p>`).join('')}${c.guideLines.length ? `<p>${esc(c.guideLines.join(' '))}</p>` : ''}<p>${esc(c.coverage)}</p></div></section>`,
@@ -163,7 +163,7 @@ export function hubPage(env, g, src) {
   const url = ORIGIN + kwPath(g);
   const title = `천안 ${g.keyword} | ${g.subs.slice(0, 3).join('·')} 동네별 상담 - ${SITE}`;
   const desc = `천안 ${g.keyword} 상담. ${g.subs.slice(0, 4).join('·')} — 동남구·서북구 읍·면·동별로 사진을 먼저 보고 가까운 업체와 이어 드려요.`;
-  const items = [['천안 집수리', '/'], [g.keyword, kwPath(g)]];
+  const items = [['천안 집수리', CITY], [g.keyword, kwPath(g)]];
   const ids = BA[g.slug] || [];
   const photos = ids.slice(0, 4).map((id, i) => ({ before: `/ba/${g.slug}/${id}-before.webp`, after: `/ba/${g.slug}/${id}-after.webp`, caption: `${g.subs[i % g.subs.length]} 참고 사례` }));
   const faq = faqOf(g, regionOf('cheonan'), g.subs, 0);
@@ -189,23 +189,41 @@ ${pickerScript(ct, g.keyword, `천안 ${g.keyword}`, '', g.slug, 'cheonan')}`;
 export function areaPage(env, r, src, shops = []) {
   const url = ORIGIN + areaPath(r);
   const title = `${r.name} 집수리 | ${GROUPS.slice(0, 4).map((g) => g.keyword).join('·')} - ${SITE}`;
-  const desc = `${r.full} 집수리 상담 모음. 배관누수·도배·타일·샷시 등 ${GROUPS.length}가지 작업을 ${r.name} 기준으로 안내하고 동네 업체와 이어 드려요.`;
-  const items = [['천안 집수리', '/'], [`${r.name} 집수리`, areaPath(r)]];
+  const desc = `${r.full} 집수리 상담 모음. 배관누수·도배·타일·샷시 등 모든 수리 항목을 ${r.name} 기준으로 안내하고 동네 업체와 이어 드려요.`;
+  const items = [['천안 집수리', CITY], [`${r.name} 집수리`, areaPath(r)]];
   const near = nearOf(r);
   const seed = hashCode(r.slug);
   const body = `<section class="home-hero"><div class="wrap"><div class="crumb">${crumbs(items)}</div><span class="eyebrow">${esc(LEVEL_LABEL[r.level])} · ${esc(r.gu ? GU_LABEL[r.gu] : '천안시')}</span><h1>${esc(r.name)} 집수리, 무엇을 고칠까요?</h1>
 <p class="lead">${esc(factLine(r))}</p><p class="lead" style="margin-top:6px">${esc(coverageLine(r))}</p></div></section>
-<div class="wrap"><section class="sec"><div class="sec-h"><h2>${esc(r.name)} 집수리 ${GROUPS.length}가지</h2></div><div class="grid g3 kw-grid">${rotate(GROUPS, seed).map((g) => `<a class="card pcard" href="${esc(pagePath(g, r))}"><div class="ph">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="${esc(r.name)} ${esc(g.keyword)}" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>${esc(r.name)} ${esc(g.keyword)}</h3><p>${esc(g.subs.slice(0, 3).join(' · '))}</p></div></a>`).join('')}</div></section>
+<div class="wrap"><section class="sec"><div class="sec-h"><h2>${esc(r.name)}의 모든 수리 항목</h2></div><div class="grid g3 kw-grid">${rotate(GROUPS, seed).map((g) => `<a class="card pcard" href="${esc(pagePath(g, r))}"><div class="ph">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="${esc(r.name)} ${esc(g.keyword)}" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>${esc(r.name)} ${esc(g.keyword)}</h3><p>${esc(g.subs.slice(0, 3).join(' · '))}</p></div></a>`).join('')}</div></section>
 ${shopsBlock(shops, r, src)}
 <section class="sec"><div class="sec-h"><h2>가까운 지역</h2></div><div class="chips">${near.map((x) => `<a href="${esc(areaPath(x))}">${esc(x.name)} 집수리</a>`).join('')}</div></section></div>`;
   const head = `${og(title, desc, url, cardOf(GROUPS[seed % GROUPS.length]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
   return page({ title, desc, body, canonical: url, head, wide: true });
 }
 
-// ── 첫 화면: 키워드·지역 포털 + 기존 기능(동네 업체, 가게 등록)
+// ── 첫 화면(/): 모든 지역을 아우르는 메인. 지금 열린 지역은 천안(/cheonan)뿐이다.
+export function mainPage(env, src) {
+  const title = BRAND;
+  const desc = '지역 골목상권 생활 밀착형 연계 플랫폼. 우리 동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요. 지금은 천안부터 열었어요.';
+  const body = `<section class="home-hero"><div class="wrap"><span class="eyebrow">지역 골목상권 생활 밀착형 연계 플랫폼</span><h1>${esc(BRAND)}</h1>
+<p class="lead">우리 동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요.</p>
+<div class="row"><a class="btn btn-ac" href="${esc(withSrc(CITY, src))}">천안 바로 가기</a><a class="btn btn-line" style="flex:none" href="${esc(withSrc('/start', src))}">내 가게 등록</a></div></div></section>
+<div class="wrap"><section class="sec" id="regions"><div class="sec-h"><h2>지역을 고르세요</h2><p>지역마다 동네 이름으로 나눈 안내와 동네 업체를 볼 수 있어요. 지금은 천안부터 열었어요.</p></div>
+<div class="grid g3"><a class="card pcard" href="${esc(withSrc(CITY, src))}"><div class="ph">${cardOf(GROUPS[0]) ? `<img src="${esc(cardOf(GROUPS[0]))}" alt="천안 집수리" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안</h3><p>동남구·서북구 읍·면·동별 집수리·생활 업체</p><span class="more">천안 열기 →</span></div></a></div></section>
+<section class="sec"><div class="sec-h"><h2>이렇게 이어 드려요</h2></div><div class="grid g3">
+<div class="card"><h3>1. 지역 고르기</h3><p>사는 도시와 동네를 고르세요.</p></div>
+<div class="card"><h3>2. 작업 고르기</h3><p>고칠 곳을 고르면 그 동네 기준 안내와 실제 작업 사진이 나와요.</p></div>
+<div class="card"><h3>3. 동네 업체 연결</h3><p>가까운 업체에 문의하거나 견적을 받아 보세요.</p></div></div></section>
+<section class="sec"><div class="panel" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>동네에서 가게를 하세요?</h3><p style="color:var(--sub)">가게 페이지를 만들면 그 동네 칸에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">내 가게 등록하기</a></div></section></div>`;
+  const head = `${og(title, desc, ORIGIN + '/', cardOf(GROUPS[0]), BRAND)}${verify(env)}<style>${KCSS}</style>${jsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, alternateName: SITE, url: ORIGIN + '/', inLanguage: 'ko-KR' })}`;
+  return page({ title, desc, body, canonical: ORIGIN + '/', head, wide: true, main: true });
+}
+
+// ── 천안 첫 화면(/cheonan): 키워드·지역 포털 + 기존 기능(동네 업체, 가게 등록)
 export function homePage(env, dongs, src) {
   const title = `천안 집수리 동네별 상담 | ${SITE}`;
-  const desc = `천안 동남구·서북구 읍·면·동별 집수리 상담. 배관누수·도배·타일·샷시·욕실 방수 등 ${GROUPS.length}가지 작업을 사진으로 먼저 보고 동네 업체와 이어 드려요.`;
+  const desc = `천안 동남구·서북구 읍·면·동별 집수리 상담. 배관누수·도배·타일·샷시·욕실 방수 등 모든 수리 항목을 사진으로 먼저 보고 동네 업체와 이어 드려요.`;
   const idx = regionIndex();
   const kwOpts = GROUPS.map((g) => `<option value="${esc(g.slug)}">${esc(g.keyword)}</option>`).join('');
   const rOpts = REGIONS.filter((r) => r.level !== 'bdong' && r.level !== 'place').map((r) => `<option value="${esc(r.slug)}">${esc(r.level === 'si' ? '천안 전체' : r.name)}</option>`).join('')
@@ -215,20 +233,21 @@ export function homePage(env, dongs, src) {
   const body = `<section class="home-hero"><div class="wrap"><span class="eyebrow">지역 골목상권 생활 밀착형 연계 플랫폼</span><h1>천안 집수리,<br>우리 동네 이름으로 찾으세요</h1>
 <p class="lead">무엇을 고칠지, 어느 동네인지 고르면 그 지역에 맞춘 안내가 나와요. 사진을 먼저 보고 가까운 동네 업체와 이어 드려요.</p>
 <form class="finder" action="/go" method="get" onsubmit="var k=this.k.value,r=this.r.value;if(k){location.href='/'+k+(r?'/'+r:'');return false}"><select name="k" aria-label="작업" required><option value="">무엇을 고칠까요?</option>${kwOpts}</select><select name="r" aria-label="지역"><option value="">어느 동네인가요?</option>${rOpts}</select><button class="btn btn-ac" type="submit">찾기</button></form></div></section>
-<div class="wrap"><section class="sec" id="keywords"><div class="sec-h"><h2>집수리 ${GROUPS.length}가지</h2><p>작업을 고르면 천안 동네별 안내와 실제 작업 사진을 볼 수 있어요.</p></div>
+<div class="wrap"><section class="sec" id="keywords"><div class="sec-h"><h2>천안의 모든 수리 항목</h2><p>작업을 고르면 천안 동네별 안내와 실제 작업 사진을 볼 수 있어요.</p></div>
 <div class="grid g3 kw-grid">${GROUPS.map((g) => `<a class="card pcard" href="${esc(kwPath(g))}"><div class="ph">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="천안 ${esc(g.keyword)}" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안 ${esc(g.keyword)}</h3><p>${esc(g.subs.slice(0, 3).join(' · '))}</p></div></a>`).join('')}</div></section>
 <section class="sec rgn" id="regions"><div class="sec-h"><h2>천안 지역별 집수리</h2><p>시·구·읍·면·동과 생활권 이름으로 나눠 두었어요.</p></div>
 <div class="chips"><a href="${esc(areaPath(regionOf('cheonan')))}">천안 전체</a><a href="${esc(areaPath(regionOf('dongnam-gu')))}">동남구</a><a href="${esc(areaPath(regionOf('seobuk-gu')))}">서북구</a></div>
 ${idx.map((x) => `<h3>${esc(x.label)}</h3><div class="chips">${[...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place].map((r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`).join('')}</div>`).join('')}</section>
 <section class="sec" id="shops"><div class="sec-h"><h2>우리 동네 업체</h2><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}
 <div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">가게 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">내 가게 등록하기</a></div></section></div>`;
-  const head = `${og(title, desc, ORIGIN + '/', cardOf(GROUPS[0]))}${verify(env)}<style>${KCSS}</style>${jsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: SITE, alternateName: '로컬브릿지AI 천안', url: ORIGIN + '/', inLanguage: 'ko-KR' })}`;
-  return page({ title, desc, body, canonical: ORIGIN + '/', head, wide: true });
+  const items = [[BRAND, '/'], ['천안 집수리', CITY]];
+  const head = `${og(title, desc, ORIGIN + CITY, cardOf(GROUPS[0]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
+  return page({ title, desc, body, canonical: ORIGIN + CITY, head, wide: true });
 }
 
 // 사이트맵용 전체 주소
 export function allPaths() {
-  const out = [];
+  const out = [CITY];
   for (const g of GROUPS) { out.push(kwPath(g)); for (const r of REGIONS) out.push(pagePath(g, r)); }
   for (const r of REGIONS) out.push(areaPath(r));
   return out;

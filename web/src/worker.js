@@ -1,5 +1,5 @@
 import { page, cleanSrc, esc, ORIGIN } from './html.js';
-import { home } from './pages/home.js';
+import { home, main } from './pages/home.js';
 import { regionPage, hubPage, areaPage, allPaths } from './kw/render.js';
 import { groupOf, regionOf } from './kw/data.js';
 import { kwShops } from './kw/shops.js';
@@ -51,10 +51,11 @@ const ROUTES = [
   [/^\/go$/, (env, m, src, req) => {
     const q = new URL(req.url).searchParams;
     const g = groupOf(q.get('k') || ''), r = regionOf(q.get('r') || '');
-    return g ? Response.redirect(`${ORIGIN}/${g.slug}${r ? `/${r.slug}` : ''}`, 302) : Response.redirect(`${ORIGIN}/`, 302);
+    return g ? Response.redirect(`${ORIGIN}/${g.slug}${r ? `/${r.slug}` : ''}`, 302) : Response.redirect(`${ORIGIN}/cheonan`, 302);
   }],
   [/^\/area\/([a-z0-9-]+)\/?$/, async (env, m, src) => { const r = regionOf(m[1]); return r ? areaPage(env, r, src, await kwShops(env, r)) : null; }],
-  [/^\/$/, (env, m, src) => home(env, src)],
+  [/^\/$/, (env, m, src) => main(env, src)],
+  [/^\/cheonan\/?$/, (env, m, src) => home(env, src)],
   [/^\/d\/([a-z0-9-]+)\/?$/, (env, m, src) => dong(env, m[1], null, src)],
   [/^\/d\/([a-z0-9-]+)\/([a-z]+)\/?$/, (env, m, src) => dong(env, m[1], m[2], src)],
   // 키워드 허브와 키워드 × 지역 페이지 — 위 고정 경로와 겹치지 않는 슬러그만 그룹으로 인정된다

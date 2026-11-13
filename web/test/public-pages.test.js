@@ -46,7 +46,7 @@ test('/sitemap.xml lists published only, escaped', async () => {
 });
 
 test('home links /start and every dong', async () => {
-  const h = await (await get(setup(), '/')).text();
+  const h = await (await get(setup(), '/cheonan')).text();
   assert.ok(h.includes('href="/start"'));
   assert.ok(h.includes('지역 골목상권 생활 밀착형 연계 플랫폼'));
   assert.ok(h.includes('동남구') && h.includes('서북구'));
@@ -61,6 +61,21 @@ test('home is indexable and in sitemap', async () => {
   assert.ok(!(await r.text()).includes('noindex'));
   const t = await (await get(env, '/sitemap.xml')).text();
   assert.ok(t.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://local.bizhelp.kr/</loc></url>'));
+  assert.ok(t.includes('<loc>https://local.bizhelp.kr/cheonan</loc>'));
+});
+
+test('/ is the all-region main titled 로컬브릿지; /cheonan is the Cheonan page', async () => {
+  const env = setup();
+  const h = await (await get(env, '/')).text();
+  assert.ok(h.includes('<title>로컬브릿지</title>'));
+  assert.ok(h.includes('href="/cheonan"'));
+  assert.ok(h.includes('<link rel="canonical" href="https://local.bizhelp.kr/">'));
+  assert.ok(!h.includes('천안의 모든 수리 항목'));
+  const c = await (await get(env, '/cheonan')).text();
+  assert.ok(c.includes('천안의 모든 수리 항목'));
+  assert.ok(c.includes('<link rel="canonical" href="https://local.bizhelp.kr/cheonan">'));
+  assert.ok(c.includes('class="logo" href="/cheonan"'));
+  assert.equal((await get(env, '/cheonan/')).status, 200);
 });
 
 test('/privacy lists every collected field', async () => {

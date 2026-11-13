@@ -74,7 +74,7 @@ test('hubs, area pages, home', async () => {
     const h = await res.text();
     for (const g of GROUPS) assert.ok(h.includes(`href="/${g.slug}/${r.slug}"`));
   }
-  const home = await (await get(e, '/')).text();
+  const home = await (await get(e, '/cheonan')).text();
   for (const g of GROUPS) assert.ok(home.includes(`href="/${g.slug}"`));
   for (const r of REGIONS) assert.ok(home.includes(`href="/area/${r.slug}"`));
 });
@@ -92,7 +92,7 @@ test('unknown keyword or region is 404; /go redirects', async () => {
 test('sitemap lists every keyword page and area page', async () => {
   const t = await (await get(env(), '/sitemap.xml')).text();
   const n = (t.match(/<loc>/g) || []).length;
-  assert.equal(n, 1 + GROUPS.length * (REGIONS.length + 1) + REGIONS.length);
+  assert.equal(n, 2 + GROUPS.length * (REGIONS.length + 1) + REGIONS.length);
   assert.ok(t.includes('<loc>https://local.bizhelp.kr/baegwan-nusu/jungang-dong</loc>'));
 });
 

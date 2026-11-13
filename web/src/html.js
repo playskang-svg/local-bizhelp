@@ -7,6 +7,11 @@ export const withSrc = (path, src) => (src ? `${path}?src=${src}` : path);
 
 export const ORIGIN = 'https://local.bizhelp.kr';
 export const SITE = '로컬브릿지AI_천안';
+export const BRAND = '로컬브릿지';
+export const CITY = '/cheonan';
+// 검색엔진 소유확인(구글·네이버·빙) + GA4 + Clarity (2026-11-13 등록). noindex 관리 페이지에는 추적 스크립트를 넣지 않는다.
+const SEO_META = '<meta name="google-site-verification" content="ebbsPBVf8YPzzbfOeK6E3tkf5au44bfbmEaxtvdBU90"><meta name="naver-site-verification" content="c3c180a5f8873cceab812c36730d4049353e9ebd"><meta name="msvalidate.01" content="86415BFFA0E8468FBD1D2BF2EEAB94C2">';
+const TRACKING = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-65CJ56JCNM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","G-65CJ56JCNM");</script><script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","zcud7fiivi");</script>';
 
 // 디자인: 흰 바탕 + 쿨 그레이 + 강조색 하나(페이지마다 --ac 로 바꾼다). 휴대폰 360px 기준, 가로 넘침 없음.
 const CSS = `:root{--bg:#fff;--soft:#f4f6f9;--line:#e4e8ee;--ink:#0f1728;--sub:#5a667a;--ac:#2457d6;--ac-soft:color-mix(in srgb,var(--ac) 9%,#fff);--r:16px;--sh:0 1px 2px rgba(16,24,40,.05),0 8px 24px rgba(16,24,40,.07)}
@@ -51,25 +56,29 @@ footer.site-f ul{list-style:none;display:grid;gap:4px;margin-top:8px}
 
 const FONT = '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">';
 
-const header = () => `<header class="site-h"><div class="wrap"><a class="logo" href="/">${SITE}<small>천안 집수리·생활 업체 연결 · by 비즈헬프</small></a>
-<nav class="nav" aria-label="주요 메뉴"><a href="/#keywords">집수리 찾기</a><a href="/#regions">지역별</a><a href="/#shops">우리 동네 업체</a><a class="cta" href="/start">내 가게 등록</a></nav></div></header>`;
+// main: 슬러그 없는 첫 화면(/, 모든 지역). 그 밖의 화면은 천안(/cheonan) 머리글을 쓴다.
+const header = (main) => (main
+  ? `<header class="site-h"><div class="wrap"><a class="logo" href="/">${BRAND}<small>동네 생활 업체 연결 · by 비즈헬프</small></a>
+<nav class="nav" aria-label="주요 메뉴"><a href="/#regions">지역 선택</a><a class="cta" href="/start">내 가게 등록</a></nav></div></header>`
+  : `<header class="site-h"><div class="wrap"><a class="logo" href="${CITY}">${SITE}<small>천안 집수리·생활 업체 연결 · by 비즈헬프</small></a>
+<nav class="nav" aria-label="주요 메뉴"><a href="${CITY}#keywords">집수리 찾기</a><a href="${CITY}#regions">지역별</a><a href="${CITY}#shops">우리 동네 업체</a><a class="cta" href="/start">내 가게 등록</a></nav></div></header>`);
 
-const footer = () => `<footer class="site-f"><div class="wrap"><div class="cols">
-<div><b>${SITE}</b><br>지역 골목상권 생활 밀착형 연계 플랫폼 · by 비즈헬프<br>천안 동남구·서북구 4개 읍·8개 면·19개 동의 집수리 상담을 동네 업체와 이어 드려요.</div>
-<div><b>바로 가기</b><ul><li><a href="/#keywords">집수리 키워드</a></li><li><a href="/#regions">천안 지역별</a></li><li><a href="/start">내 가게 등록하기</a></li></ul></div>
+const footer = (main) => `<footer class="site-f"><div class="wrap"><div class="cols">
+<div><b>${main ? BRAND : SITE}</b><br>지역 골목상권 생활 밀착형 연계 플랫폼 · by 비즈헬프<br>${main ? '동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요.' : '천안 동남구·서북구 4개 읍·8개 면·19개 동의 집수리 상담을 동네 업체와 이어 드려요.'}</div>
+<div><b>바로 가기</b><ul><li><a href="/">${BRAND} 처음</a></li><li><a href="${CITY}">천안</a></li><li><a href="/start">내 가게 등록하기</a></li></ul></div>
 <div><b>안내</b><ul><li><a href="/privacy">개인정보 처리방침</a></li><li><a href="/sitemap.xml">사이트맵</a></li></ul></div>
 </div></div></footer>`;
 
-export function page({ title, desc, body, noindex = false, canonical, status = 200, head = '', accent = '', fixbar = '', wide = false }) {
+export function page({ title, desc, body, noindex = false, canonical, status = 200, head = '', accent = '', fixbar = '', wide = false, main = false }) {
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 ${noindex ? '<meta name="robots" content="noindex">' : ''}${canonical ? `<link rel="canonical" href="${esc(canonical)}">` : ''}
-<meta name="theme-color" content="#ffffff">${head}${FONT}
+<meta name="theme-color" content="#ffffff">${SEO_META}${noindex ? '' : TRACKING}${head}${FONT}
 <style>${CSS}${accent ? `:root{--ac:${accent}}` : ''}</style></head><body>
-${header()}
+${header(main)}
 <main${wide ? '' : ' class="wrap narrow" style="padding-top:28px"'}>${body}</main>
-${footer()}${fixbar}
+${footer(main)}${fixbar}
 </body></html>`;
   // noindex 화면(/ack/<토큰>, /edit 등)은 주소에 토큰이 있어 리퍼러를 보내지 않는다
   const headers = { 'content-type': 'text/html; charset=utf-8', 'referrer-policy': noindex ? 'no-referrer' : 'strict-origin-when-cross-origin' };
