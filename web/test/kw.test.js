@@ -92,7 +92,7 @@ test('unknown keyword or region is 404; /go redirects', async () => {
 test('sitemap lists every keyword page and area page', async () => {
   const t = await (await get(env(), '/sitemap.xml')).text();
   const n = (t.match(/<loc>/g) || []).length;
-  assert.equal(n, 2 + GROUPS.length * (REGIONS.length + 1) + REGIONS.length);
+  assert.equal(n, 4 + GROUPS.length * (REGIONS.length + 1) + REGIONS.length);
   assert.ok(t.includes('<loc>https://local.bizhelp.kr/baegwan-nusu/jungang-dong</loc>'));
 });
 

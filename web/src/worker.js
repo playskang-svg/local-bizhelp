@@ -5,6 +5,7 @@ import { groupOf, regionOf } from './kw/data.js';
 import { kwShops } from './kw/shops.js';
 import { submitLead } from './lib/lead.js';
 import { privacy } from './pages/privacy.js';
+import { guidePage, GUIDE_PATHS } from './pages/guide.js';
 import { dong } from './pages/dong.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
@@ -23,7 +24,7 @@ const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/ad
 
 // Route table: [regex, handler(env, match, src)]. Handler returns Response or null (-> 404). Later tasks append rows.
 const ROUTES = [
-  [/^\/start\/?$/, (env) => start(env)],
+  [/^\/start\/?$/, (env, m, src, req) => start(env, req)],
   [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
   [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
   [/^\/edit\/?$/, () => editPage()],
@@ -39,11 +40,12 @@ const ROUTES = [
   [/^\/api\/edit-link$/, (env, m, src, req) => editLink(req, env)],
   [/^\/media\/(landings\/\d+\/[\w-]+\.(?:jpg|png|webp))$/, (env, m) => mediaGet(env, m[1])],
   [/^\/privacy\/?$/, () => privacy()],
+  [/^\/guide\/([a-z0-9-]+)\/?$/, (env, m) => guidePage(m[1])],
   [/^\/robots\.txt$/, () => new Response(ROBOTS, { headers: { 'content-type': 'text/plain; charset=utf-8' } })],
   [/^\/sitemap\.xml$/, async (env) => {
     const rows = (await env.D1.prepare("SELECT slug, updated_at FROM landings WHERE status = 'published' ORDER BY id").all()).results;
     const loc = (p, lastmod) => `<url><loc>${ORIGIN}${esc(p)}</loc>${lastmod ? `<lastmod>${esc(lastmod)}</lastmod>` : ''}</url>`;
-    const urls = loc('/') + allPaths().map((p) => loc(p)).join('') + rows.map((r) => loc(`/p/${r.slug}`, r.updated_at)).join('');
+    const urls = loc('/') + [...GUIDE_PATHS, ...allPaths()].map((p) => loc(p)).join('') + rows.map((r) => loc(`/p/${r.slug}`, r.updated_at)).join('');
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
   }],
   [/^\/api\/lead$/, (env, m, src, req) => submitLead(req, env)],

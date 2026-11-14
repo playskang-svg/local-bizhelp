@@ -1,3 +1,4 @@
+import { GUIDE_LIST } from '../pages/guide.js';
 // 키워드 사이트 화면. suriwiki 키워드 사이트(bizhelp/scripts/page-template.mjs)의 구성 —
 // 히어로(+전후 사진) → 신뢰 띠 → 작업 항목 → 증상 → 전후 비교 → 유형 안내 → 진행 절차 → 지역 → FAQ → 체크하고 문자 보내기 —
 // 을 local.bizhelp.kr 한 도메인 안의 /<키워드>/<지역> 구조로 옮기고, 디자인은 새로 짰다.
@@ -238,6 +239,7 @@ export function homePage(env, dongs, src) {
 <section class="sec rgn" id="regions"><div class="sec-h"><h2>천안 지역별 집수리</h2><p>시·구·읍·면·동과 생활권 이름으로 나눠 두었어요.</p></div>
 <div class="chips"><a href="${esc(areaPath(regionOf('cheonan')))}">천안 전체</a><a href="${esc(areaPath(regionOf('dongnam-gu')))}">동남구</a><a href="${esc(areaPath(regionOf('seobuk-gu')))}">서북구</a></div>
 ${idx.map((x) => `<h3>${esc(x.label)}</h3><div class="chips">${[...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place].map((r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`).join('')}</div>`).join('')}</section>
+<section class="sec" id="guides"><div class="sec-h"><h2>맡기기 전에 읽어 보세요</h2><p>업체 찾는 순서와 견적 비교 기준을 정리했어요.</p></div><div class="grid g2">${GUIDE_LIST.map((x) => `<a class="card" href="${esc(x.path)}"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><span class="more">읽어 보기</span></a>`).join('')}</div></section>
 <section class="sec" id="shops"><div class="sec-h"><h2>우리 동네 업체</h2><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}
 <div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">가게 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">내 가게 등록하기</a></div></section></div>`;
   const items = [[BRAND, '/'], ['천안 집수리', CITY]];

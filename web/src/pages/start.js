@@ -4,7 +4,15 @@ import { TRADES } from './dong.js';
 
 const GU = { dongnam: '동남구', seobuk: '서북구' };
 
-export async function start(env) {
+// 지금 열린 지역은 천안뿐. 지역을 먼저 고른 뒤(?r=cheonan) 등록 폼을 보여준다.
+const REGION_PICK = `<h1>어느 지역에서 가게를 하세요?</h1><p class="lead">지역을 먼저 고르면 가게를 등록할 수 있어요.</p>
+<div class="row" style="flex-wrap:wrap;gap:12px"><a class="btn btn-ac" href="/start?r=cheonan">천안</a>
+<span class="btn btn-line" aria-disabled="true" style="opacity:.5;cursor:not-allowed">다른 지역은 준비 중이에요</span></div>`;
+
+export async function start(env, req) {
+  if (new URL(req.url).searchParams.get('r') !== 'cheonan') {
+    return page({ title: '지역 선택 | 가게 등록 | 로컬브릿지', desc: '가게를 등록할 지역을 먼저 골라요.', body: REGION_PICK, noindex: true });
+  }
   const dongs = await listDongs(env);
   const groups = Object.entries(GU).map(([gu, label]) =>
     `<optgroup label="${label}">${dongs.filter((d) => d.gu === gu).map((d) => `<option value="${esc(d.slug)}">${esc(d.name)}</option>`).join('')}</optgroup>`).join('');

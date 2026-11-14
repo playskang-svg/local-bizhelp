@@ -93,6 +93,12 @@ test('http redirects to https (301) except localhost', async () => {
 });
 
 test('/start links to the relink screen', async () => {
-  const h = await (await get(setup(), '/start')).text();
+  const h = await (await get(setup(), '/start?r=cheonan')).text();
   assert.match(h, /<a href="\/edit">수정 주소를 잃어버리셨나요\? 다시 받기<\/a>/);
+});
+
+test('/start asks for a region before showing the form', async () => {
+  const h = await (await get(setup(), '/start')).text();
+  assert.ok(h.includes('href="/start?r=cheonan"'));
+  assert.ok(!h.includes('id="f1"'));
 });
