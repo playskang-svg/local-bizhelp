@@ -8,7 +8,7 @@ import { privacy } from './pages/privacy.js';
 import { guidePage, GUIDE_PATHS } from './pages/guide.js';
 import { dong } from './pages/dong.js';
 import { loginPage } from './pages/login.js';
-import { authOn, getSession, authStart, authCallback, logout } from './lib/auth.js';
+import { authOn, NEXT, getSession, authStart, authCallback, logout } from './lib/auth.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
 import { editPage } from './pages/edit.js';
@@ -31,7 +31,7 @@ const ROUTES = [
   [/^\/auth\/(google|naver)\/callback$/, (env, m, src, req) => authCallback(req, env, m[1])],
   [/^\/logout$/, () => logout()],
   // 로그인 키가 설정된 뒤에만 등록 화면을 로그인으로 막는다(미설정이면 기존 휴대폰 인증 등록 그대로)
-  [/^\/start\/?$/, async (env, m, src, req) => (authOn(env) && !(await getSession(req, env)) ? Response.redirect(`${ORIGIN}/login`, 302) : start(env, req))],
+  [/^\/start\/?$/, async (env, m, src, req) => (authOn(env) && !(await getSession(req, env)) ? Response.redirect(`${ORIGIN}/login`, 302) : authOn(env) ? Response.redirect(NEXT, 302) : start(env, req))],
   [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
   [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
   [/^\/edit\/?$/, () => editPage()],

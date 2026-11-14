@@ -59,13 +59,13 @@ const FONT = '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin
 // main: 슬러그 없는 첫 화면(/, 모든 지역). 그 밖의 화면은 천안(/cheonan) 머리글을 쓴다.
 const header = (main) => (main
   ? `<header class="site-h"><div class="wrap"><a class="logo" href="/">${BRAND}<small>동네 생활 업체 연결 · by 비즈헬프</small></a>
-<nav class="nav" aria-label="주요 메뉴"><a href="/#regions">지역 선택</a><a class="cta" href="/start">내 가게 등록</a></nav></div></header>`
+<nav class="nav" aria-label="주요 메뉴"><a href="/#regions">지역 선택</a></nav></div></header>`
   : `<header class="site-h"><div class="wrap"><a class="logo" href="${CITY}">${SITE}<small>천안 집수리·생활 업체 연결 · by 비즈헬프</small></a>
-<nav class="nav" aria-label="주요 메뉴"><a href="${CITY}#keywords">집수리 찾기</a><a href="${CITY}#regions">지역별</a><a href="${CITY}#shops">우리 동네 업체</a><a class="cta" href="/start">내 가게 등록</a></nav></div></header>`);
+<nav class="nav" aria-label="주요 메뉴"><a href="${CITY}#keywords">집수리 찾기</a><a href="${CITY}#regions">지역별</a><a href="${CITY}#shops">우리 동네 업체</a><a class="cta" href="/start">홍보페이지 만들기 (무료)</a></nav></div></header>`);
 
 const footer = (main) => `<footer class="site-f"><div class="wrap"><div class="cols">
 <div><b>${main ? BRAND : SITE}</b><br>지역 골목상권 생활 밀착형 연계 플랫폼 · by 비즈헬프<br>${main ? '동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요.' : '천안 동남구·서북구 4개 읍·8개 면·19개 동의 집수리 상담을 동네 업체와 이어 드려요.'}</div>
-<div><b>바로 가기</b><ul><li><a href="/">${BRAND} 처음</a></li><li><a href="${CITY}">천안</a></li><li><a href="/start">내 가게 등록하기</a></li></ul></div>
+<div><b>바로 가기</b><ul><li><a href="/">${BRAND} 처음</a></li><li><a href="${CITY}">천안</a></li><li><a href="/start">홍보페이지 만들기 (무료)</a></li></ul></div>
 <div><b>안내</b><ul><li><a href="/privacy">개인정보 처리방침</a></li><li><a href="/sitemap.xml">사이트맵</a></li></ul></div>
 </div></div></footer>`;
 

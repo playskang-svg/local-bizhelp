@@ -126,7 +126,7 @@ function shopsBlock(shops, r, src) {
   const dong = dongSlugOf(r);
   const cards = shops.map((l) => { let c = {}; try { c = JSON.parse(l.content || '{}'); } catch { /* 깨진 content: 이름만 */ } return `<a class="card" href="${esc(withSrc(`/p/${l.slug}`, src))}"><h3>${esc(l.name || c.name)}</h3>${c.tagline ? `<p>${esc(c.tagline)}</p>` : ''}<span class="more">업체 페이지 보기 →</span></a>`; }).join('');
   return `<section class="sec" id="shops"><div class="sec-h"><h2>${esc(r.name)} 등록 업체</h2><p>${shops.length ? '직접 페이지를 만든 동네 업체예요. 업체 페이지에서 바로 문의할 수 있어요.' : '아직 이 동네에 직접 등록한 업체가 없어요. 위 문자 상담으로 남겨 주시면 가까운 업체와 이어 드려요.'}</p></div>
-${cards ? `<div class="grid g2">${cards}</div>` : ''}<div class="row" style="margin-top:14px">${dong ? `<a class="btn btn-line" href="${esc(withSrc(`/d/${dong}`, src))}">${esc(DONG_NAME[dong])} 업체 전체 보기</a>` : ''}<a class="btn btn-line" href="${esc(withSrc('/start', src))}">사장님이세요? 내 가게 등록</a></div></section>`;
+${cards ? `<div class="grid g2">${cards}</div>` : ''}<div class="row" style="margin-top:14px">${dong ? `<a class="btn btn-line" href="${esc(withSrc(`/d/${dong}`, src))}">${esc(DONG_NAME[dong])} 업체 전체 보기</a>` : ''}<a class="btn btn-line" href="${esc(withSrc('/start', src))}">홍보페이지 만들기 (무료)</a></div></section>`;
 }
 
 // ── 키워드 × 지역
@@ -207,16 +207,13 @@ ${shopsBlock(shops, r, src)}
 export function mainPage(env, src) {
   const title = BRAND;
   const desc = '지역 골목상권 생활 밀착형 연계 플랫폼. 우리 동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요. 지금은 천안부터 열었어요.';
-  const body = `<section class="home-hero"><div class="wrap"><span class="eyebrow">지역 골목상권 생활 밀착형 연계 플랫폼</span><h1>${esc(BRAND)}</h1>
-<p class="lead">우리 동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요.</p>
-<div class="row"><a class="btn btn-ac" href="${esc(withSrc(CITY, src))}">천안 바로 가기</a><a class="btn btn-line" style="flex:none" href="${esc(withSrc('/start', src))}">내 가게 등록</a></div></div></section>
-<div class="wrap"><section class="sec" id="regions"><div class="sec-h"><h2>지역을 고르세요</h2><p>지역마다 동네 이름으로 나눈 안내와 동네 업체를 볼 수 있어요. 지금은 천안부터 열었어요.</p></div>
+  const body = `<div class="wrap"><section class="sec" id="regions"><div class="sec-h"><h1 style="font-size:clamp(23px,4.4vw,30px)">지역을 고르세요</h1><p>지역마다 동네 이름으로 나눈 안내와 동네 업체를 볼 수 있어요. 지금은 천안부터 열었어요.</p></div>
 <div class="grid g3"><a class="card pcard" href="${esc(withSrc(CITY, src))}"><div class="ph">${cardOf(GROUPS[0]) ? `<img src="${esc(cardOf(GROUPS[0]))}" alt="천안 집수리" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안</h3><p>동남구·서북구 읍·면·동별 집수리·생활 업체</p><span class="more">천안 열기 →</span></div></a></div></section>
 <section class="sec"><div class="sec-h"><h2>이렇게 이어 드려요</h2></div><div class="grid g3">
 <div class="card"><h3>1. 지역 고르기</h3><p>사는 도시와 동네를 고르세요.</p></div>
 <div class="card"><h3>2. 작업 고르기</h3><p>고칠 곳을 고르면 그 동네 기준 안내와 실제 작업 사진이 나와요.</p></div>
 <div class="card"><h3>3. 동네 업체 연결</h3><p>가까운 업체에 문의하거나 견적을 받아 보세요.</p></div></div></section>
-<section class="sec"><div class="panel" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>동네에서 가게를 하세요?</h3><p style="color:var(--sub)">가게 페이지를 만들면 그 동네 칸에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">내 가게 등록하기</a></div></section></div>`;
+</div>`;
   const head = `${og(title, desc, ORIGIN + '/', cardOf(GROUPS[0]), BRAND)}${verify(env)}<style>${KCSS}</style>${jsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, alternateName: SITE, url: ORIGIN + '/', inLanguage: 'ko-KR' })}`;
   return page({ title, desc, body, canonical: ORIGIN + '/', head, wide: true, main: true });
 }
@@ -241,7 +238,7 @@ export function homePage(env, dongs, src) {
 ${idx.map((x) => `<h3>${esc(x.label)}</h3><div class="chips">${[...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place].map((r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`).join('')}</div>`).join('')}</section>
 <section class="sec" id="guides"><div class="sec-h"><h2>맡기기 전에 읽어 보세요</h2><p>업체 찾는 순서와 견적 비교 기준을 정리했어요.</p></div><div class="grid g2">${GUIDE_LIST.map((x) => `<a class="card" href="${esc(x.path)}"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><span class="more">읽어 보기</span></a>`).join('')}</div></section>
 <section class="sec" id="shops"><div class="sec-h"><h2>우리 동네 업체</h2><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}
-<div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">가게 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">내 가게 등록하기</a></div></section></div>`;
+<div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">홍보 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">홍보페이지 만들기 (무료)</a></div></section></div>`;
   const items = [[BRAND, '/'], ['천안 집수리', CITY]];
   const head = `${og(title, desc, ORIGIN + CITY, cardOf(GROUPS[0]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
   return page({ title, desc, body, canonical: ORIGIN + CITY, head, wide: true });

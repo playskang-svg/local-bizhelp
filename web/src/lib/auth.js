@@ -17,7 +17,8 @@ export const PROVIDERS = {
   },
 };
 
-export const NEXT = '/start?r=cheonan';
+// 가입이 끝나면 m.bizhelp.kr 에서 무료 페이지를 만든다. 세션 쿠키는 .bizhelp.kr 전체에서 읽히고, m. 쪽이 같은 SESSION_SECRET 으로 검증한다.
+export const NEXT = 'https://m.bizhelp.kr/free';
 const SESSION_DAYS = 30;
 const enc = new TextEncoder();
 const b64 = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -42,7 +43,7 @@ export async function unsign(env, token) {
 }
 
 const cookie = (req, name) => (req.headers.get('cookie') || '').split(/;\s*/).map((c) => c.split(/=(.*)/s)).find(([k]) => k === name)?.[1] || '';
-const setCookie = (name, value, maxAge) => `${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+const setCookie = (name, value, maxAge) => `${name}=${value}; Path=/; Domain=.bizhelp.kr; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 const redirect = (to, cookies = []) => {
   const h = new Headers({ location: to, 'cache-control': 'no-store' });
   cookies.forEach((c) => h.append('set-cookie', c));

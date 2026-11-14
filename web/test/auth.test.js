@@ -18,7 +18,7 @@ test('/login shows free vs paid plans with the m.bizhelp.kr link', async () => {
   const h = await (await get({}, '/login')).text();
   assert.ok(h.includes('무료형') && h.includes('유료형') && h.includes('0원') && h.includes('월 10만 원'));
   assert.ok(h.includes('href="https://m.bizhelp.kr"'));
-  assert.ok(h.includes('href="/start?r=cheonan"')); // 키 없으면 기존 휴대폰 인증 등록으로 이어짐
+  assert.ok(h.includes('href="/start?r=cheonan"')); // 키 없으면 기존 휴대폰 인증 등록
   assert.ok(!h.includes('href="/auth/naver"'));
 });
 
@@ -33,7 +33,7 @@ test('/start is open without keys, gated to /login with keys', async () => {
   assert.equal(r.status, 302);
   assert.equal(r.headers.get('location'), 'https://local.bizhelp.kr/login');
   const s = await sign(ON, { p: 'naver', id: '9', n: '홍', exp: Date.now() + 1e5 });
-  assert.notEqual((await get(ON, '/start', { cookie: `lb_s=${s}` })).headers.get('location'), 'https://local.bizhelp.kr/login');
+  assert.equal((await get(ON, '/start', { cookie: `lb_s=${s}` })).headers.get('location'), 'https://m.bizhelp.kr/free');
 });
 
 test('naver callback: state must match, then sets session and goes to /start', async () => {
@@ -49,7 +49,8 @@ test('naver callback: state must match, then sets session and goes to /start', a
   const bad = await authCallback(req('wrong'), ON, 'naver', fake);
   assert.equal(bad.headers.get('location'), '/login?e=fail');
   const ok = await authCallback(req(state), ON, 'naver', fake);
-  assert.equal(ok.headers.get('location'), '/start?r=cheonan');
+  assert.equal(ok.headers.get('location'), 'https://m.bizhelp.kr/free');
+  assert.ok(ok.headers.getSetCookie().find((c) => c.startsWith('lb_s=')).includes('Domain=.bizhelp.kr'));
   const sess = ok.headers.getSetCookie().find((c) => c.startsWith('lb_s=')).split(';')[0].slice(5);
   assert.equal((await unsign(ON, sess)).n, '홍길동');
 });

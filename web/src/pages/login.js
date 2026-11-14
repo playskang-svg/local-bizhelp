@@ -25,7 +25,7 @@ export async function loginPage(env, req) {
     : `<span class="btn sns ${k}" aria-disabled="true">${label}로 시작하기 (준비 중)</span>`);
   const free = s
     ? `<p class="who">${esc(s.n || '사장')}님, 로그인되어 있어요.</p><a class="btn btn-ac" href="${NEXT}">무료 페이지 만들기</a><a class="sub" href="/logout">로그아웃</a>`
-    : `${btn('naver', '네이버')}${btn('google', '구글')}${on ? '' : `<a class="sub" href="${NEXT}">휴대폰 인증으로 무료 등록하기</a>`}`;
+    : `${btn('naver', '네이버')}${btn('google', '구글')}${on ? '' : `<a class="sub" href="/start?r=cheonan">휴대폰 인증으로 무료 등록하기</a>`}`;
   const body = `<style>
 .pg{display:grid;gap:16px;margin-top:24px}@media(min-width:720px){.pg{grid-template-columns:1fr 1fr}}
 .pc{border:1px solid var(--line);border-radius:20px;padding:24px;background:#fff;display:flex;flex-direction:column;gap:14px}
