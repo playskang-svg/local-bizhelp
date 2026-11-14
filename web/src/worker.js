@@ -7,6 +7,8 @@ import { submitLead } from './lib/lead.js';
 import { privacy } from './pages/privacy.js';
 import { guidePage, GUIDE_PATHS } from './pages/guide.js';
 import { dong } from './pages/dong.js';
+import { loginPage } from './pages/login.js';
+import { authOn, getSession, authStart, authCallback, logout } from './lib/auth.js';
 import { start } from './pages/start.js';
 import { claimVerify, claimConfirm } from './lib/claim.js';
 import { editPage } from './pages/edit.js';
@@ -20,11 +22,16 @@ const notFound = () => page({
   body: '<h1>페이지를 찾을 수 없어요</h1><p class="lead">주소를 다시 확인해 주세요.</p><a class="btn" href="/">처음으로</a>',
 });
 
-const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/admin', '/cms-api', '/go'].map((p) => `Disallow: ${p}`), 'Sitemap: https://local.bizhelp.kr/sitemap.xml', ''].join('\n');
+const ROBOTS = ['User-agent: *', 'Allow: /', ...['/edit', '/ack/', '/api/', '/auth/', '/login', '/logout', '/admin', '/cms-api', '/go'].map((p) => `Disallow: ${p}`), 'Sitemap: https://local.bizhelp.kr/sitemap.xml', ''].join('\n');
 
 // Route table: [regex, handler(env, match, src)]. Handler returns Response or null (-> 404). Later tasks append rows.
 const ROUTES = [
-  [/^\/start\/?$/, (env, m, src, req) => start(env, req)],
+  [/^\/login\/?$/, (env, m, src, req) => loginPage(env, req)],
+  [/^\/auth\/(google|naver)\/?$/, (env, m) => authStart(env, m[1])],
+  [/^\/auth\/(google|naver)\/callback$/, (env, m, src, req) => authCallback(req, env, m[1])],
+  [/^\/logout$/, () => logout()],
+  // 로그인 키가 설정된 뒤에만 등록 화면을 로그인으로 막는다(미설정이면 기존 휴대폰 인증 등록 그대로)
+  [/^\/start\/?$/, async (env, m, src, req) => (authOn(env) && !(await getSession(req, env)) ? Response.redirect(`${ORIGIN}/login`, 302) : start(env, req))],
   [/^\/api\/claim\/verify$/, (env, m, src, req) => claimVerify(req, env)],
   [/^\/api\/claim\/confirm$/, (env, m, src, req) => claimConfirm(req, env)],
   [/^\/edit\/?$/, () => editPage()],

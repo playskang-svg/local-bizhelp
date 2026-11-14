@@ -15,7 +15,7 @@ test('data: 14 groups, 66 Cheonan regions, unique slugs, no route clash', () => 
   assert.equal(REGIONS.length, 66);
   const all = [...GROUPS.map((g) => g.slug)];
   assert.equal(new Set(all).size, all.length);
-  for (const fixed of ['start', 'edit', 'p', 'd', 'api', 'ack', 'media', 'privacy', 'admin', 'cms-api', 'area', 'go', 'ba', 'img']) assert.ok(!groupOf(fixed), fixed);
+  for (const fixed of ['start', 'login', 'auth', 'logout', 'edit', 'p', 'd', 'api', 'ack', 'media', 'privacy', 'admin', 'cms-api', 'area', 'go', 'ba', 'img']) assert.ok(!groupOf(fixed), fixed);
   for (const r of REGIONS) if (r.parent) assert.ok(regionOf(r.parent), r.slug);
 });
 
