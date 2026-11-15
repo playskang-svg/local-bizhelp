@@ -4,6 +4,7 @@ import { regionPage, hubPage, areaPage, allPaths } from './kw/render.js';
 import { groupOf, regionOf } from './kw/data.js';
 import { kwShops } from './kw/shops.js';
 import { submitLead } from './lib/lead.js';
+import { submitDirect, purgeDirect } from './lib/direct.js';
 import { privacy } from './pages/privacy.js';
 import { guidePage, GUIDE_PATHS } from './pages/guide.js';
 import { dong } from './pages/dong.js';
@@ -56,6 +57,7 @@ const ROUTES = [
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
   }],
   [/^\/api\/lead$/, (env, m, src, req) => submitLead(req, env)],
+  [/^\/api\/direct-inquiry$/, (env, m, src, req) => submitDirect(req, env)],
   // 검색창(자바스크립트 없이 제출한 경우)
   [/^\/go$/, (env, m, src, req) => {
     const q = new URL(req.url).searchParams;
@@ -89,5 +91,5 @@ export default {
     }
     return notFound();
   },
-  async scheduled(event, env, ctx) { await runCron(env); }
+  async scheduled(event, env, ctx) { await runCron(env); await purgeDirect(env); }
 };

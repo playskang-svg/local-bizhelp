@@ -45,9 +45,9 @@ test('/sitemap.xml lists published only, escaped', async () => {
   assert.ok(!t.includes('draft-1'));
 });
 
-test('home links /start and every dong', async () => {
+test('home links m.bizhelp.kr/free and every dong', async () => {
   const h = await (await get(setup(), '/cheonan')).text();
-  assert.ok(h.includes('href="/start"'));
+  assert.ok(h.includes('href="https://m.bizhelp.kr/free"'));
   assert.ok(h.includes('지역 골목상권 생활 밀착형 연계 플랫폼'));
   assert.ok(h.includes('동남구') && h.includes('서북구'));
   assert.ok(!h.includes('곧 시작'));

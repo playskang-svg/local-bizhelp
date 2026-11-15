@@ -7,6 +7,7 @@ import { GROUPS, REGIONS, GU_LABEL, LEVEL_LABEL, groupOf, regionOf, nearOf, kwPa
 import { composePage, faqOf, sectionOrder, TEMPLATES, josa, factLine, coverageLine, hashCode, rotate } from './compose.js';
 import { BA } from './data.js';
 import { contactOf } from './contact.js';
+import { directForm, directScript, DIRECT_CSS } from './direct-form.js';
 import dongsJson from '../../../shared/dongs.json' with { type: 'json' };
 
 const accentOf = (g) => (TEMPLATES[g.template] || TEMPLATES.consult).accent;
@@ -126,7 +127,7 @@ function shopsBlock(shops, r, src) {
   const dong = dongSlugOf(r);
   const cards = shops.map((l) => { let c = {}; try { c = JSON.parse(l.content || '{}'); } catch { /* 깨진 content: 이름만 */ } return `<a class="card" href="${esc(withSrc(`/p/${l.slug}`, src))}"><h3>${esc(l.name || c.name)}</h3>${c.tagline ? `<p>${esc(c.tagline)}</p>` : ''}<span class="more">업체 페이지 보기 →</span></a>`; }).join('');
   return `<section class="sec" id="shops"><div class="sec-h"><h2>${esc(r.name)} 등록 업체</h2><p>${shops.length ? '직접 페이지를 만든 동네 업체예요. 업체 페이지에서 바로 문의할 수 있어요.' : '아직 이 동네에 직접 등록한 업체가 없어요. 위 문자 상담으로 남겨 주시면 가까운 업체와 이어 드려요.'}</p></div>
-${cards ? `<div class="grid g2">${cards}</div>` : ''}<div class="row" style="margin-top:14px">${dong ? `<a class="btn btn-line" href="${esc(withSrc(`/d/${dong}`, src))}">${esc(DONG_NAME[dong])} 업체 전체 보기</a>` : ''}<a class="btn btn-line" href="${esc(withSrc('/start', src))}">홍보페이지 만들기 (무료)</a></div></section>`;
+${cards ? `<div class="grid g2">${cards}</div>` : ''}<div class="row" style="margin-top:14px">${dong ? `<a class="btn btn-line" href="${esc(withSrc(`/d/${dong}`, src))}">${esc(DONG_NAME[dong])} 업체 전체 보기</a>` : ''}<a class="btn btn-line" href="https://m.bizhelp.kr/free">홍보페이지 만들기 (무료)</a></div></section>`;
 }
 
 // ── 키워드 × 지역
@@ -152,9 +153,9 @@ export async function regionPage(env, g, r, src, shops = []) {
   };
   const ev = c.photos[0];
   const body = `${heroBlock({ img: heroOf(g), crumb: crumbs(items), h1: name, hl: c.headline, lead: desc, ev, ct })}${trustBlock(g, r, ct)}
-<div class="wrap">${sectionOrder(g, c.seed).map((n) => sec[n]()).join('')}</div>${pickerScript(ct, g.keyword, name, r.name, g.slug, r.slug)}`;
+<div class="wrap">${sectionOrder(g, c.seed).map((n) => sec[n]()).join('')}${directForm({ g, r, pageType: 'kw_region' })}</div>${pickerScript(ct, g.keyword, name, r.name, g.slug, r.slug)}${directScript({ pageType: 'kw_region', g: g.slug, r: r.slug })}`;
   const head = `${og(title, desc, url, ev ? ev.after : heroOf(g))}${verify(env)}<meta name="keywords" content="${esc([name, ...c.subs.slice(0, 4).map((s) => `${r.name} ${s}`), ...c.longtail.slice(0, 3), `천안 ${g.keyword}`].join(', '))}">
-<style>${KCSS}</style>${breadcrumbLd(items)}${faqLd(c.faq)}${jsonLd({ '@context': 'https://schema.org', '@type': 'Service', name, serviceType: g.keyword, url, areaServed: { '@type': 'Place', name: r.full }, provider: { '@type': 'Organization', name: '비즈헬프', url: ORIGIN + '/' }, hasOfferCatalog: { '@type': 'OfferCatalog', name: `${g.keyword} 작업`, itemListElement: c.subs.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s } })) } })}`;
+<style>${KCSS}${DIRECT_CSS}</style>${breadcrumbLd(items)}${faqLd(c.faq)}${jsonLd({ '@context': 'https://schema.org', '@type': 'Service', name, serviceType: g.keyword, url, areaServed: { '@type': 'Place', name: r.full }, provider: { '@type': 'Organization', name: '비즈헬프', url: ORIGIN + '/' }, hasOfferCatalog: { '@type': 'OfferCatalog', name: `${g.keyword} 작업`, itemListElement: c.subs.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s } })) } })}`;
   return page({ title, desc, body, canonical: url, head, accent: accentOf(g), fixbar: fixbar(ct), wide: true });
 }
 
@@ -198,8 +199,9 @@ export function areaPage(env, r, src, shops = []) {
 <p class="lead">${esc(factLine(r))}</p><p class="lead" style="margin-top:6px">${esc(coverageLine(r))}</p></div></section>
 <div class="wrap"><section class="sec"><div class="sec-h"><h2>${esc(r.name)}의 모든 수리 항목</h2></div><div class="grid g3 kw-grid">${rotate(GROUPS, seed).map((g) => `<a class="card pcard" href="${esc(pagePath(g, r))}"><div class="ph">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="${esc(r.name)} ${esc(g.keyword)}" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>${esc(r.name)} ${esc(g.keyword)}</h3><p>${esc(g.subs.slice(0, 3).join(' · '))}</p></div></a>`).join('')}</div></section>
 ${shopsBlock(shops, r, src)}
-<section class="sec"><div class="sec-h"><h2>가까운 지역</h2></div><div class="chips">${near.map((x) => `<a href="${esc(areaPath(x))}">${esc(x.name)} 집수리</a>`).join('')}</div></section></div>`;
-  const head = `${og(title, desc, url, cardOf(GROUPS[seed % GROUPS.length]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
+${directForm({ r, pageType: 'area' })}
+<section class="sec"><div class="sec-h"><h2>가까운 지역</h2></div><div class="chips">${near.map((x) => `<a href="${esc(areaPath(x))}">${esc(x.name)} 집수리</a>`).join('')}</div></section></div>${directScript({ pageType: 'area', r: r.slug })}`;
+  const head = `${og(title, desc, url, cardOf(GROUPS[seed % GROUPS.length]))}${verify(env)}<style>${KCSS}${DIRECT_CSS}</style>${breadcrumbLd(items)}`;
   return page({ title, desc, body, canonical: url, head, wide: true });
 }
 
@@ -238,7 +240,7 @@ export function homePage(env, dongs, src) {
 ${idx.map((x) => `<h3>${esc(x.label)}</h3><div class="chips">${[...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place].map((r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`).join('')}</div>`).join('')}</section>
 <section class="sec" id="guides"><div class="sec-h"><h2>맡기기 전에 읽어 보세요</h2><p>업체 찾는 순서와 견적 비교 기준을 정리했어요.</p></div><div class="grid g2">${GUIDE_LIST.map((x) => `<a class="card" href="${esc(x.path)}"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><span class="more">읽어 보기</span></a>`).join('')}</div></section>
 <section class="sec" id="shops"><div class="sec-h"><h2>우리 동네 업체</h2><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}
-<div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">홍보 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="${esc(withSrc('/start', src))}">홍보페이지 만들기 (무료)</a></div></section></div>`;
+<div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">홍보 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="https://m.bizhelp.kr/free">홍보페이지 만들기 (무료)</a></div></section></div>`;
   const items = [[BRAND, '/'], ['천안 집수리', CITY]];
   const head = `${og(title, desc, ORIGIN + CITY, cardOf(GROUPS[0]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
   return page({ title, desc, body, canonical: ORIGIN + CITY, head, wide: true });
