@@ -7,14 +7,14 @@ import { esc } from '../html.js';
 import { GROUPS, REGIONS, regionOf } from './data.js';
 import { DIRECT_REGIONS, DIRECT_OTHER, DIRECT_UNKNOWN } from '../lib/direct.js';
 
-export const DIRECT_CSS = `.dq{border:1px solid var(--line);border-radius:22px;padding:26px 22px;box-shadow:var(--sh);background:#fff}
+export const DIRECT_CSS = `.dq{border:1px solid var(--line);border-radius:var(--r);padding:28px 22px;box-shadow:var(--sh);background:#fff}
 .dq .why{margin-bottom:18px}.dq h2{margin-bottom:6px}
 .dq .f{display:grid;gap:14px;margin-top:18px}@media(min-width:640px){.dq .f{grid-template-columns:1fr 1fr}.dq .f .full{grid-column:1/-1}}
 .dq label.l{display:block;font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px}
-.dq select,.dq input[type=date],.dq input[type=tel]{width:100%;min-height:52px;border:1px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.dq select,.dq input[type=date],.dq input[type=tel]{width:100%;min-height:52px;border:1px solid var(--line);border-radius:var(--r2);padding:0 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
 .dq .ag{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.6}.dq .ag input{width:20px;height:20px;margin-top:4px;flex:none}
-.dq .notice{background:var(--soft);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--sub);line-height:1.7}.dq .notice a{text-decoration:underline;text-underline-offset:3px}
-.dq .btn{width:100%}.dq .msg{margin-top:12px;font-size:15px;font-weight:600}.dq .msg.err{color:#c0262d}.dq .msg.ok{color:#0a7a3d}
+.dq .notice{background:var(--soft);border-radius:var(--r2);padding:14px 16px;font-size:14px;color:var(--sub);line-height:1.7}.dq .notice a{text-decoration:underline;text-underline-offset:3px}
+.dq .btn{width:100%}.dq .msg{margin-top:12px;font-size:15px;font-weight:600}.dq .msg.err{color:#c0262d}.dq .msg.ok{color:var(--ac)}
 .dq .hp{position:absolute;left:-9999px;height:0;overflow:hidden}`;
 
 const WORK = (g) => [...GROUPS.map((x) => `<option value="${esc(x.slug)}"${g && x.slug === g.slug ? ' selected' : ''}>${esc(x.keyword)}</option>`), `<option value="${DIRECT_UNKNOWN}">잘 모르겠어요</option>`].join('');

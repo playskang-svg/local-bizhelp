@@ -102,3 +102,33 @@ test('/start asks for a region before showing the form', async () => {
   assert.ok(h.includes('href="/start?r=cheonan"'));
   assert.ok(!h.includes('id="f1"'));
 });
+
+test('A안 디자인: 홈은 검색 카드·신뢰 띠·세 단계, /cheonan 은 구 탭·하단 고정 견적 버튼', async () => {
+  const env = setup();
+  const h = await (await get(env, '/')).text();
+  assert.ok(h.includes('class="finder"') && h.includes('name="k"') && h.includes('action="/go"'));
+  for (const s of ['확인된 업체만', '동네 단위', '사진 먼저', '견적 문의', '세 단계로 이어 드려요', 'AFTER', '#faf7f2']) assert.ok(h.includes(s), s);
+  assert.ok(h.includes('Noto+Serif+KR') && h.includes('display=swap') && h.includes('pretendard'));
+  const c = await (await get(env, '/cheonan')).text();
+  assert.ok(c.includes('role="tablist"') && c.includes('동남구') && c.includes('서북구') && c.includes('천안 전체'));
+  assert.ok(c.includes('class="fixbar"') && c.includes('이 동네 견적 문의하기'));
+  assert.ok(!c.includes('(예시)'), '예시 업체 문구 금지');
+});
+
+test('/cheonan 업체 카드는 공개된 실제 업체만, 없으면 안내 문구', async () => {
+  const c = await (await get(setup(), '/cheonan')).text();
+  assert.ok(c.includes('href="/p/pub-1"') && c.includes('href="/p/a&amp;b"'));
+  assert.ok(!c.includes('href="/p/draft-1"'));
+  const D1 = makeD1();
+  const empty = await (await get({ D1 }, '/cheonan')).text();
+  assert.ok(empty.includes('아직 직접 등록한 업체가 없어요') && !empty.includes('<article class="v">'));
+});
+
+test('/cheonan 하단 고정 버튼은 /area/cheonan 의 직접 문의 폼으로 이어진다', async () => {
+  const env = setup();
+  const c = await (await get(env, '/cheonan')).text();
+  assert.ok(c.includes('class="fixbar"><a class="btn btn-ac" href="/area/cheonan#inquiry">이 동네 견적 문의하기'));
+  assert.ok(!c.includes('id="dq"'), '/cheonan 에는 폼·GA 이벤트를 넣지 않는다');
+  const a = await (await get(env, '/area/cheonan')).text();
+  assert.ok(a.includes('id="inquiry"') && a.includes('id="dq"') && a.includes('action="/api/direct-inquiry"'));
+});

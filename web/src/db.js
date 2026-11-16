@@ -17,3 +17,9 @@ export async function publishedLandingsIn(env, dongSlug, trade) {
 export const publishedLandingBySlug = (env, slug) =>
   env.D1.prepare(`SELECT l.id, l.slug, l.content, l.areas, b.name, b.address FROM landings l
     JOIN businesses b ON b.id = l.business_id WHERE l.slug = ? AND l.status = 'published'`).bind(slug).first();
+
+// /cheonan 의 '우리 동네 업체' 카드용: 공개된 업체 페이지(최근 순)
+export async function publishedLandings(env, limit = 12) {
+  return (await env.D1.prepare(`SELECT l.slug, l.content, l.areas, b.name, b.trade FROM landings l
+    JOIN businesses b ON b.id = l.business_id WHERE l.status = 'published' ORDER BY l.id DESC LIMIT ?1`).bind(limit).all()).results;
+}

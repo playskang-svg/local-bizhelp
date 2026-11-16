@@ -8,6 +8,7 @@ import { composePage, faqOf, sectionOrder, TEMPLATES, josa, factLine, coverageLi
 import { BA } from './data.js';
 import { contactOf } from './contact.js';
 import { directForm, directScript, DIRECT_CSS } from './direct-form.js';
+import { TRADES } from '../pages/dong.js';
 import dongsJson from '../../../shared/dongs.json' with { type: 'json' };
 
 const accentOf = (g) => (TEMPLATES[g.template] || TEMPLATES.consult).accent;
@@ -27,20 +28,18 @@ export function dongSlugOf(r) {
   return null;
 }
 
-const KCSS = `.hero{position:relative;background:#0f1728;color:#fff;overflow:hidden}.hero .bg{position:absolute;inset:0}.hero .bg img{width:100%;height:100%;object-fit:cover;opacity:.42}
-.hero .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,40,.15),rgba(15,23,40,.85))}
-.hero .in{position:relative;padding:56px 20px 44px;max-width:1080px;margin:0 auto}.hero .crumb,.hero .crumb a{color:#c9d3e2}.hero .lead{color:#dbe3ee}
-.hero .hl{font-size:clamp(18px,3.6vw,22px);font-weight:700;color:color-mix(in srgb,var(--ac) 35%,#fff);margin-top:10px}
+const KCSS = `.hero{position:relative;background:#23211d;color:#fff;overflow:hidden}.hero .bg{position:absolute;inset:0}.hero .bg img{width:100%;height:100%;object-fit:cover;opacity:.5}
+.hero .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,18,14,.15),rgba(20,18,14,.85))}
+.hero .in{position:relative;padding:56px 20px 44px;max-width:1080px;margin:0 auto}.hero .crumb,.hero .crumb a{color:#ddd6c8}.hero .lead{color:#ece6da}
+.hero .hl{font-size:clamp(18px,3.6vw,22px);font-weight:700;color:#efd2b8;margin-top:10px}
 .hero .ev{display:flex;gap:10px;margin-top:26px;max-width:420px}.hero .ev figure{position:relative;flex:1;aspect-ratio:4/5;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.25)}
-.hero .ev img{width:100%;height:100%;object-fit:cover}.hero .ev figcaption{position:absolute;left:8px;top:8px;font-size:12px;font-weight:700;background:rgba(15,23,40,.75);padding:2px 9px;border-radius:99px}
-.trust{display:grid;grid-template-columns:repeat(2,1fr);border-bottom:1px solid var(--line)}@media(min-width:760px){.trust{grid-template-columns:repeat(4,1fr)}}
-.trust div{padding:16px 14px;text-align:center;font-size:14.5px;font-weight:600;color:var(--sub);border-right:1px solid var(--line)}.trust b{display:block;color:var(--ink);font-size:16px}
+.hero .ev img{width:100%;height:100%;object-fit:cover}.hero .ev figcaption{position:absolute;left:8px;top:8px;font-size:12px;font-weight:700;background:rgba(20,18,14,.75);padding:2px 9px;border-radius:99px}
 .ba{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff}
 .ba-s{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--soft);touch-action:pan-y;user-select:none;cursor:ew-resize}
 .ba-s img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}.ba-s .b{clip-path:inset(0 50% 0 0)}
 .ba-s .h{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);pointer-events:none}
 .ba-s .h:after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M9 7l-5 5 5 5M15 7l5 5-5 5'/%3E%3C/svg%3E") center/18px no-repeat;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.ba-s .t{position:absolute;top:10px;font-size:12px;font-weight:700;color:#fff;background:rgba(15,23,40,.72);padding:2px 9px;border-radius:99px}.ba-s .tb{left:10px}.ba-s .ta{right:10px}
+.ba-s .t{position:absolute;top:10px;font-size:12px;font-weight:700;color:#fff;background:rgba(20,18,14,.72);padding:2px 9px;border-radius:99px}.ba-s .tb{left:10px}.ba-s .ta{right:10px}
 .ba .cap{padding:12px 16px;font-size:15px;font-weight:600}
 .tbl{width:100%;border-collapse:collapse;font-size:15.5px}.tbl th,.tbl td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);vertical-align:top}.tbl th{font-size:13px;color:var(--sub)}
 @media(max-width:640px){.tbl thead{display:none}.tbl tr{display:block;border-bottom:1px solid var(--line);padding:12px 0}.tbl td{display:block;border:0;padding:2px 0}.tbl td:first-child{font-weight:800;font-size:17px}}
@@ -59,9 +58,46 @@ summary:after{content:"+";position:absolute;right:4px;top:14px;font-size:24px;fo
 .picker .btn-ac{width:100%;margin-top:14px}.hint{margin-top:10px;font-size:14px;color:var(--sub)}
 .kw-grid .pcard h3{font-size:18px}.kw-grid .pcard p{font-size:14.5px}
 .rgn h3{font-size:15px;color:var(--sub);margin:18px 0 8px}.rgn .chips a{font-size:14.5px;padding:6px 12px}
-.home-hero{background:linear-gradient(180deg,var(--ac-soft),#fff);padding:52px 0 36px}
-.finder{display:grid;gap:10px;grid-template-columns:1fr;margin-top:26px;max-width:640px}@media(min-width:640px){.finder{grid-template-columns:1fr 1fr auto}}
-.finder select{min-height:52px;border:1px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}`;
+.home-hero{background:linear-gradient(180deg,var(--soft),var(--bg));padding:52px 0 36px}
+
+.dh{position:relative;color:#fff;background:#23211d;overflow:hidden;display:flex;align-items:flex-end;min-height:clamp(440px,58vw,580px)}.dh.sm-h{min-height:clamp(360px,42vw,420px)}
+.dh .bg{position:absolute;inset:0}.dh .bg img{width:100%;height:100%;object-fit:cover}.dh .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,18,14,.18),rgba(20,18,14,.76))}
+.dh .in{position:relative;z-index:2;width:100%;max-width:1120px;margin:0 auto;padding:84px 20px 86px}
+.dh .ey{font-size:12.5px;letter-spacing:.14em;opacity:.9;margin-bottom:16px;font-weight:600}
+.dh h1{color:#fff;font-size:clamp(32px,7vw,60px);line-height:1.16;text-shadow:0 2px 18px rgba(0,0,0,.25)}
+.dh p{font-size:clamp(15px,2.4vw,17px);line-height:1.7;max-width:540px;margin-top:18px;opacity:.95}
+.finder{position:relative;z-index:3;display:grid;grid-template-columns:1fr;margin-top:-46px;background:#fff;border-radius:var(--r);box-shadow:0 18px 40px rgba(35,33,29,.16);padding:12px}
+.finder .fc{padding:10px 16px;border-bottom:1px solid var(--line)}.finder label{display:block;font-size:11.5px;color:var(--sub);letter-spacing:.06em;font-weight:600;margin-bottom:2px}
+.finder select{width:100%;border:0;background:transparent;font:inherit;font-size:16px;font-weight:700;color:var(--ink);padding:4px 0;min-height:34px;cursor:pointer}
+.finder .btn{margin-top:12px;width:100%;min-height:54px}
+@media(min-width:760px){.finder{grid-template-columns:1.2fr 1.2fr auto;align-items:center}.finder .fc{border-bottom:0;border-right:1px solid var(--line)}.finder .btn{margin:0 0 0 12px;width:auto;padding:0 40px;min-height:58px}}
+.trust{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
+.trust div{padding:18px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px;line-height:1.55;color:var(--sub)}
+.trust b{display:block;font-family:var(--serif);color:var(--ac);font-size:18px;line-height:1.35;margin-bottom:3px;font-weight:700}
+.trust div:nth-child(2n){border-right:0}.trust div:nth-last-child(-n+2){border-bottom:0}
+@media(min-width:760px){.trust{grid-template-columns:repeat(4,1fr)}.trust div{border-bottom:0;padding:26px 22px;font-size:13.5px}.trust div:nth-child(2n){border-right:1px solid var(--line)}.trust div:last-child{border-right:0}.trust b{font-size:23px}}
+.pop{display:grid;gap:16px;grid-template-columns:1fr}@media(min-width:760px){.pop{grid-template-columns:1.4fr 1fr 1fr}}
+.cd{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#2b2823;min-height:240px;color:#fff;isolation:isolate}@media(min-width:760px){.cd{min-height:340px}.cd.lg{min-height:420px}}
+.cd img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform .5s}.cd:hover img{transform:scale(1.04)}
+.cd:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(20,18,14,0) 36%,rgba(20,18,14,.82))}
+.cd .t{position:absolute;display:block;left:22px;right:22px;bottom:20px}.cd .t b{display:block;font-family:var(--serif);font-size:22px;line-height:1.3;margin-bottom:6px;font-weight:700}.cd .t span{display:block;font-size:13px;line-height:1.5;opacity:.92}
+.sm{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:16px}@media(min-width:760px){.sm{grid-template-columns:repeat(5,1fr)}}
+.sm a{display:block;border:1px solid var(--line);border-radius:var(--r2);padding:16px;background:#fff;transition:border-color .15s,box-shadow .15s}.sm a:hover{border-color:var(--ac);box-shadow:var(--sh)}
+.sm b{display:block;font-size:15px;line-height:1.4;margin-bottom:4px}.sm span{display:block;font-size:12.5px;color:var(--sub);line-height:1.5}
+.how{display:grid;grid-template-columns:1fr;border-top:1px solid var(--ink);list-style:none}@media(min-width:760px){.how{grid-template-columns:repeat(3,1fr)}}
+.how li{padding:24px 24px 8px 0}.how i{font-style:normal;font-family:var(--serif);font-size:34px;line-height:1;color:var(--ac)}.how b{display:block;font-size:18px;margin:12px 0 6px}.how span{display:block;color:var(--sub);font-size:15px;line-height:1.7}
+.rw{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}@media(min-width:760px){.rw{grid-template-columns:repeat(4,1fr);gap:18px}}
+.rw figure{position:relative}.rw img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r);background:var(--soft)}.rw figcaption{margin-top:10px;font-size:14.5px;font-weight:600}.rw figcaption span{display:block;color:var(--sub);font-size:12.5px;font-weight:400;margin-top:2px}
+.tag{position:absolute;z-index:2;top:12px;left:12px;background:rgba(255,255,255,.94);color:var(--ink);font-size:11px;padding:5px 10px;border-radius:99px;font-weight:700;letter-spacing:.04em}
+.partner{margin-top:72px;border-radius:var(--r);background:var(--ac);color:#fff;padding:36px 26px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}@media(min-width:760px){.partner{padding:52px 56px}}
+.partner h2{color:#fff;font-size:clamp(22px,3.6vw,30px)}.partner p{opacity:.88;font-size:15px;margin-top:8px}.partner a.btn{background:#fff;color:var(--ink);box-shadow:none}.partner a.btn:hover{background:var(--soft)}
+.tabs{display:flex;gap:26px;border-bottom:1px solid var(--line)}.tabs[hidden]{display:none}.tabs button{background:none;border:0;font:inherit;font-size:15.5px;color:var(--sub);padding:12px 0;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.tabs button[aria-selected=true]{color:var(--ink);font-weight:700;border-bottom-color:var(--ac)}
+.tpanel{padding-top:18px}.tpanel[hidden]{display:none}.tp-h{font-size:15px;color:var(--sub);margin:8px 0}.js .tp-h{display:none}
+.chips a.on{background:var(--ink);color:#fff;border-color:var(--ink)}.js .tpanel:not(.open) .chips a.x{display:none}
+.chipmore{display:none;background:#fff;border:1px solid var(--line);border-radius:99px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer;color:var(--ink)}.js .chipmore{display:inline-block}.chipmore:hover{border-color:var(--ac);color:var(--ac)}
+.vend{display:grid;gap:18px;grid-template-columns:1fr}@media(min-width:760px){.vend{grid-template-columns:repeat(3,1fr)}}
+.v{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;display:flex;flex-direction:column}.v .vp{height:190px;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--sub);font-family:var(--serif);font-size:34px}.v .vp img{width:100%;height:100%;object-fit:cover}
+.v .vb{padding:20px;display:flex;flex-direction:column;gap:10px;flex:1}.v b{font-size:17px;line-height:1.4}.v p{font-size:14px;color:var(--sub);line-height:1.6}.v .tg{display:flex;flex-wrap:wrap;gap:6px}.v .tg span{font-size:11.5px;background:#efe8da;padding:4px 10px;border-radius:99px}.v a.btn{margin-top:auto;min-height:46px;font-size:14.5px;width:100%}`;
 
 const pickerScript = (ct, kw, pageName, region, g, r) => `<script>(function(){
 var CT=${JSON.stringify({ mode: ct.mode, phone: ct.phone, url: ct.url || '', subs: ct.subs || {} })},KW=${JSON.stringify(kw)},PAGE=${JSON.stringify(pageName)},REGION=${JSON.stringify(region)},G=${JSON.stringify(g)},R=${JSON.stringify(r)};
@@ -111,9 +147,10 @@ ${crumb ? `<div class="crumb">${crumb}</div>` : ''}<h1>${esc(h1)}</h1><p class="
 ${ev ? `<div class="ev"><figure><img src="${esc(ev.before)}" alt="${esc(h1)} 작업 전" loading="eager"><figcaption>작업 전</figcaption></figure><figure><img src="${esc(ev.after)}" alt="${esc(h1)} 작업 후" loading="eager"><figcaption>작업 후</figcaption></figure></div>` : ''}</div></section>`;
 }
 
-const trustBlock = (g, r, ct) => (ct.mode === 'sms'
-  ? `<div class="trust"><div><b>사진 먼저</b>가능 여부부터 안내</div><div><b>${r ? esc(r.name) : '천안 66곳'}</b>${r ? '가까운 업체 연결' : '읍·면·동별 상담'}</div><div><b>문자·전화</b>편한 쪽으로 상담</div><div><b>비용은</b>현장 확인 후 안내</div></div>`
-  : `<div class="trust"><div><b>견적 비교</b>여러 업체 견적을 한 번에</div><div><b>${r ? esc(r.name) : '천안 66곳'}</b>${r ? '동네 기준 안내' : '읍·면·동별 안내'}</div><div><b>실제 사진</b>작업 전후 사례</div><div><b>비용은</b>현장 확인 후 결정</div></div>`);
+const trustBlock = (g, r, ct) => `<div class="wrap">${trustInner(g, r, ct)}</div>`;
+const trustInner = (g, r, ct) => (ct.mode === 'sms'
+  ? `<div class="trust" style="margin-top:0"><div><b>사진 먼저</b>가능 여부부터 안내</div><div><b>${r ? esc(r.name) : '천안 66곳'}</b>${r ? '가까운 업체 연결' : '읍·면·동별 상담'}</div><div><b>문자·전화</b>편한 쪽으로 상담</div><div><b>비용은</b>현장 확인 후 안내</div></div>`
+  : `<div class="trust" style="margin-top:0"><div><b>견적 비교</b>여러 업체 견적을 한 번에</div><div><b>${r ? esc(r.name) : '천안 66곳'}</b>${r ? '동네 기준 안내' : '읍·면·동별 안내'}</div><div><b>실제 사진</b>작업 전후 사례</div><div><b>비용은</b>현장 확인 후 결정</div></div>`);
 
 const fixbar = (ct) => (hasContact(ct) ? `<div class="fixbar"><a class="btn btn-ac" href="#picker">${CTA[ct.mode]}</a>${ct.phone ? `<a class="btn btn-line" href="tel:${esc(ct.phone)}">전화</a>` : ''}</div>` : '');
 
@@ -205,46 +242,107 @@ ${directForm({ r, pageType: 'area' })}
   return page({ title, desc, body, canonical: url, head, wide: true });
 }
 
+// ── 첫 화면 공통 조각(A안): 인기 수리 카드·검색 카드·신뢰 띠·세 단계·최근 작업·입점 배너
+const sub3 = (g) => g.subs.slice(0, 3).join(' · ');
+const popularBlock = (big, small) => `<div class="pop">${big.map((g, i) => `<a class="cd${i === 0 ? ' lg' : ''}" href="${esc(kwPath(g))}">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="" loading="lazy" decoding="async">` : ''}<span class="t"><b>${esc(g.keyword)}</b><span>${esc(sub3(g))}</span></span></a>`).join('')}</div>
+<div class="sm">${small.map((g) => `<a href="${esc(kwPath(g))}"><b>${esc(g.keyword)}</b><span>${esc(sub3(g))}</span></a>`).join('')}</div>`;
+
+const RECENT = ['gagu-reform', 'gyedan-suri', 'veranda-sigong', 'silnae-jakeop'];
+function recentBlock() {
+  const items = RECENT.map((s) => groupOf(s)).filter((g) => g && (BA[g.slug] || [])[0]);
+  if (!items.length) return '';
+  return `<section class="sec" id="recent"><div class="sec-h"><span class="kick">RECENT WORK</span><h2>최근 작업 사진</h2><p>실제 작업 사진이에요. 눌러서 그 작업의 동네별 안내를 볼 수 있어요.</p></div>
+<div class="rw">${items.map((g) => `<figure><span class="tag">AFTER</span><a href="${esc(kwPath(g))}"><img src="/ba/${esc(g.slug)}/${esc(BA[g.slug][0])}-after.webp" alt="${esc(g.keyword)} 작업 후" loading="lazy" decoding="async"></a><figcaption>${esc(g.keyword)}<span>실제 작업 사진</span></figcaption></figure>`).join('')}</div></section>`;
+}
+
+const partnerBlock = (h, p) => `<section class="partner"><div><h2>${esc(h)}</h2><p>${esc(p)}</p></div><a class="btn" href="https://m.bizhelp.kr/free">홍보페이지 만들기 (무료)</a></section>`;
+
+const designTrust = () => `<div class="wrap"><div class="trust tr-top"><div><b>확인된 업체만</b>직접 등록 업체는 사업자·휴대폰 확인</div><div><b>동네 단위</b>읍·면·동 이름으로 바로 찾기</div><div><b>사진 먼저</b>실제 작업 사진을 보고 선택</div><div><b>견적 문의</b>동네 업체에 문의·견적 요청</div></div></div>`;
+
+function finderBlock() {
+  const kwOpts = GROUPS.map((g) => `<option value="${esc(g.slug)}">${esc(g.keyword)}</option>`).join('');
+  const rOpts = REGIONS.filter((r) => r.level !== 'bdong' && r.level !== 'place').map((r) => `<option value="${esc(r.slug)}">${esc(r.level === 'si' ? '천안 전체' : r.name)}</option>`).join('')
+    + `<optgroup label="법정동·생활권">${REGIONS.filter((r) => r.level === 'bdong' || r.level === 'place').map((r) => `<option value="${esc(r.slug)}">${esc(r.name)}</option>`).join('')}</optgroup>`;
+  return `<div class="wrap"><form class="finder" id="finder" action="/go" method="get" onsubmit="var k=this.k.value,r=this.r.value;if(k){location.href='/'+k+(r?'/'+r:'');return false}">
+<div class="fc"><label for="f-k">무엇을 고칠까요?</label><select id="f-k" name="k" required><option value="">작업 고르기</option>${kwOpts}</select></div>
+<div class="fc"><label for="f-r">어느 동네인가요?</label><select id="f-r" name="r"><option value="">천안 전체</option>${rOpts}</select></div>
+<button class="btn btn-ac" type="submit">업체 찾기</button></form></div>`;
+}
+
+const HOW = `<ol class="how"><li><i>01</i><b>동네 고르기</b><span>사는 도시와 읍·면·동을 선택해요.</span></li><li><i>02</i><b>작업 고르기</b><span>고칠 곳을 고르면 그 동네 기준 안내와 작업 사진이 나와요.</span></li><li><i>03</i><b>업체 연결</b><span>가까운 업체에 문의하거나 견적을 받아 보세요.</span></li></ol>`;
+
 // ── 첫 화면(/): 모든 지역을 아우르는 메인. 지금 열린 지역은 천안(/cheonan)뿐이다.
 export function mainPage(env, src) {
   const title = BRAND;
   const desc = '지역 골목상권 생활 밀착형 연계 플랫폼. 우리 동네 이름으로 집수리·생활 업체를 찾고, 가까운 동네 업체와 이어 드려요. 지금은 천안부터 열었어요.';
-  const body = `<div class="wrap"><section class="sec" id="regions"><div class="sec-h"><h1 style="font-size:clamp(23px,4.4vw,30px)">지역을 고르세요</h1><p>지역마다 동네 이름으로 나눈 안내와 동네 업체를 볼 수 있어요. 지금은 천안부터 열었어요.</p></div>
-<div class="grid g3"><a class="card pcard" href="${esc(withSrc(CITY, src))}"><div class="ph">${cardOf(GROUPS[0]) ? `<img src="${esc(cardOf(GROUPS[0]))}" alt="천안 집수리" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안</h3><p>동남구·서북구 읍·면·동별 집수리·생활 업체</p><span class="more">천안 열기 →</span></div></a></div></section>
-<section class="sec"><div class="sec-h"><h2>이렇게 이어 드려요</h2></div><div class="grid g3">
-<div class="card"><h3>1. 지역 고르기</h3><p>사는 도시와 동네를 고르세요.</p></div>
-<div class="card"><h3>2. 작업 고르기</h3><p>고칠 곳을 고르면 그 동네 기준 안내와 실제 작업 사진이 나와요.</p></div>
-<div class="card"><h3>3. 동네 업체 연결</h3><p>가까운 업체에 문의하거나 견적을 받아 보세요.</p></div></div></section>
-</div>`;
+  const hero = cardOf(GROUPS[0]);
+  const body = `<section class="dh">${hero ? `<div class="bg"><img src="${esc(hero)}" alt="" fetchpriority="high"></div>` : ''}<div class="in"><div class="ey">LOCAL BRIDGE · 천안</div><h1>우리 동네 이름으로<br>찾는 집수리</h1>
+<p>어느 동네, 무엇을 고칠지만 고르세요. 그 동네 기준 안내와 실제 작업 사진을 먼저 보고 가까운 업체와 이어 드려요.</p></div></section>
+${finderBlock()}${designTrust()}
+<div class="wrap"><section class="sec" id="popular"><div class="sec-h"><span class="kick">POPULAR</span><h2>천안에서 많이 찾는 수리</h2><p>작업을 고르면 천안 동네별 안내와 실제 작업 사진을 볼 수 있어요.</p></div>${popularBlock(GROUPS.slice(0, 3), GROUPS.slice(3, 8))}</section>
+<section class="sec" id="regions"><div class="sec-h"><span class="kick">REGION</span><h2>지역을 고르세요</h2><p>지역마다 동네 이름으로 나눈 안내와 동네 업체를 볼 수 있어요. 지금은 천안부터 열었어요.</p></div>
+<div class="grid g3"><a class="card pcard" href="${esc(withSrc(CITY, src))}"><div class="ph">${hero ? `<img src="${esc(hero)}" alt="천안 집수리" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안</h3><p>동남구·서북구 읍·면·동별 집수리·생활 업체</p><span class="more">천안 열기 →</span></div></a></div></section>
+<section class="sec" id="how"><div class="sec-h"><span class="kick">HOW IT WORKS</span><h2>세 단계로 이어 드려요</h2></div>${HOW}</section>
+${recentBlock()}
+${partnerBlock('동네에서 일하시는 사장님이신가요?', '홍보 페이지를 만들고 우리 동네 이름으로 노출해 보세요.')}</div>`;
   const head = `${og(title, desc, ORIGIN + '/', cardOf(GROUPS[0]), BRAND)}${verify(env)}<style>${KCSS}</style>${jsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, alternateName: SITE, url: ORIGIN + '/', inLanguage: 'ko-KR' })}`;
   return page({ title, desc, body, canonical: ORIGIN + '/', head, wide: true, main: true });
 }
 
+// 실제 등록 업체 카드(가짜·예시 없음). 사진이 없으면 글자 칸으로 둔다.
+function vendorCards(vendors, src) {
+  return vendors.map((l) => {
+    let c = {}; try { c = JSON.parse(l.content || '{}'); } catch { /* 깨진 content: 이름만 */ }
+    let areas = []; try { areas = JSON.parse(l.areas || '[]'); } catch { /* 지역 없음 */ }
+    const name = l.name || c.name || '';
+    const photo = (Array.isArray(c.photos) ? c.photos : []).find((k) => typeof k === 'string' && /^landings\/[\w-]+\/[\w-]+\.(jpg|png|webp)$/.test(k));
+    const tags = [TRADES[l.trade], ...areas.slice(0, 2).map((s) => DONG_NAME[s])].filter(Boolean);
+    return `<article class="v"><div class="vp">${photo ? `<img src="/media/${esc(photo)}" alt="${esc(name)}" loading="lazy" decoding="async">` : `<span aria-hidden="true">${esc(name.slice(0, 1))}</span>`}</div><div class="vb"><b>${esc(name)}</b>${c.tagline ? `<p>${esc(c.tagline)}</p>` : ''}${tags.length ? `<div class="tg">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}<a class="btn" href="${esc(withSrc(`/p/${l.slug}`, src))}">문의하기</a></div></article>`;
+  }).join('');
+}
+
 // ── 천안 첫 화면(/cheonan): 키워드·지역 포털 + 기존 기능(동네 업체, 가게 등록)
-export function homePage(env, dongs, src) {
+export function homePage(env, dongs, src, vendors = []) {
   const title = `천안 집수리 동네별 상담 | ${SITE}`;
   const desc = `천안 동남구·서북구 읍·면·동별 집수리 상담. 배관누수·도배·타일·샷시·욕실 방수 등 모든 수리 항목을 사진으로 먼저 보고 동네 업체와 이어 드려요.`;
   const idx = regionIndex();
-  const kwOpts = GROUPS.map((g) => `<option value="${esc(g.slug)}">${esc(g.keyword)}</option>`).join('');
-  const rOpts = REGIONS.filter((r) => r.level !== 'bdong' && r.level !== 'place').map((r) => `<option value="${esc(r.slug)}">${esc(r.level === 'si' ? '천안 전체' : r.name)}</option>`).join('')
-    + `<optgroup label="법정동·생활권">${REGIONS.filter((r) => r.level === 'bdong' || r.level === 'place').map((r) => `<option value="${esc(r.slug)}">${esc(r.name)}</option>`).join('')}</optgroup>`;
+  const hero = cardOf(GROUPS[0]);
+  const chip = (r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`;
+  const MAXC = 9;
+  const guPanel = (x, i) => {
+    const gr = regionOf(x.gu === 'dongnam' ? 'dongnam-gu' : 'seobuk-gu');
+    const list = [...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place];
+    return `<div class="tpanel" role="tabpanel" id="tp-${i}" aria-labelledby="tt-${i}" data-tp><h3 class="tp-h">${esc(x.label)}</h3><div class="chips"><a class="on" href="${esc(areaPath(gr))}">${esc(x.label)} 전체</a>${list.map((r, n) => (n < MAXC ? chip(r) : chip(r).replace('<a ', '<a class="x" '))).join('')}${list.length > MAXC ? `<button type="button" class="chipmore">+ 더 보기</button>` : ''}</div></div>`;
+  };
+  const allPanel = `<div class="tpanel" role="tabpanel" id="tp-2" aria-labelledby="tt-2" data-tp><h3 class="tp-h">천안 전체</h3><div class="chips"><a class="on" href="${esc(areaPath(regionOf('cheonan')))}">천안 전체</a><a href="${esc(areaPath(regionOf('dongnam-gu')))}">동남구</a><a href="${esc(areaPath(regionOf('seobuk-gu')))}">서북구</a></div></div>`;
+  const tabNames = [idx[0].label, idx[1].label, '천안 전체'];
+  const tabs = `<div class="tabs" role="tablist" aria-label="구 선택" data-tabs hidden>${tabNames.map((n, i) => `<button type="button" role="tab" id="tt-${i}" aria-controls="tp-${i}" aria-selected="${i === 0}">${esc(n)}</button>`).join('')}</div>`;
   const GU = [['dongnam', '동남구'], ['seobuk', '서북구']];
   const shops = GU.map(([gu, label]) => { const links = dongs.filter((d) => d.gu === gu).map((d) => `<li><a href="${esc(withSrc(`/d/${d.slug}`, src))}">${esc(d.name)}</a></li>`).join(''); return links ? `<div class="panel" style="margin-top:12px"><h3>${label}</h3><ul class="chips" style="margin-top:10px">${links}</ul></div>` : ''; }).join('');
-  const body = `<section class="home-hero"><div class="wrap"><span class="eyebrow">지역 골목상권 생활 밀착형 연계 플랫폼</span><h1>천안 집수리,<br>우리 동네 이름으로 찾으세요</h1>
-<p class="lead">무엇을 고칠지, 어느 동네인지 고르면 그 지역에 맞춘 안내가 나와요. 사진을 먼저 보고 가까운 동네 업체와 이어 드려요.</p>
-<form class="finder" action="/go" method="get" onsubmit="var k=this.k.value,r=this.r.value;if(k){location.href='/'+k+(r?'/'+r:'');return false}"><select name="k" aria-label="작업" required><option value="">무엇을 고칠까요?</option>${kwOpts}</select><select name="r" aria-label="지역"><option value="">어느 동네인가요?</option>${rOpts}</select><button class="btn btn-ac" type="submit">찾기</button></form></div></section>
-<div class="wrap"><section class="sec" id="keywords"><div class="sec-h"><h2>천안의 모든 수리 항목</h2><p>작업을 고르면 천안 동네별 안내와 실제 작업 사진을 볼 수 있어요.</p></div>
-<div class="grid g3 kw-grid">${GROUPS.map((g) => `<a class="card pcard" href="${esc(kwPath(g))}"><div class="ph">${cardOf(g) ? `<img src="${esc(cardOf(g))}" alt="천안 ${esc(g.keyword)}" loading="lazy" decoding="async">` : ''}</div><div class="tx"><h3>천안 ${esc(g.keyword)}</h3><p>${esc(g.subs.slice(0, 3).join(' · '))}</p></div></a>`).join('')}</div></section>
-<section class="sec rgn" id="regions"><div class="sec-h"><h2>천안 지역별 집수리</h2><p>시·구·읍·면·동과 생활권 이름으로 나눠 두었어요.</p></div>
-<div class="chips"><a href="${esc(areaPath(regionOf('cheonan')))}">천안 전체</a><a href="${esc(areaPath(regionOf('dongnam-gu')))}">동남구</a><a href="${esc(areaPath(regionOf('seobuk-gu')))}">서북구</a></div>
-${idx.map((x) => `<h3>${esc(x.label)}</h3><div class="chips">${[...x.eupmyeon, ...x.dong, ...x.bdong, ...x.place].map((r) => `<a href="${esc(areaPath(r))}">${esc(r.name)}</a>`).join('')}</div>`).join('')}</section>
-<section class="sec" id="guides"><div class="sec-h"><h2>맡기기 전에 읽어 보세요</h2><p>업체 찾는 순서와 견적 비교 기준을 정리했어요.</p></div><div class="grid g2">${GUIDE_LIST.map((x) => `<a class="card" href="${esc(x.path)}"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><span class="more">읽어 보기</span></a>`).join('')}</div></section>
-<section class="sec" id="shops"><div class="sec-h"><h2>우리 동네 업체</h2><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}
-<div class="panel" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h3>천안에서 가게를 하세요?</h3><p style="color:var(--sub)">홍보 페이지를 만들면 동네 칸 맨 위에 보여요.</p></div><a class="btn btn-ac" href="https://m.bizhelp.kr/free">홍보페이지 만들기 (무료)</a></div></section></div>`;
+  const vend = vendors.length
+    ? `<div class="vend">${vendorCards(vendors, src)}</div>`
+    : '<div class="card"><p style="margin-top:0">아직 직접 등록한 업체가 없어요. 위에서 고칠 곳을 고르면 가까운 동네 업체와 이어 드려요.</p></div>';
+  const body = `<section class="dh sm-h">${hero ? `<div class="bg"><img src="${esc(hero)}" alt="" fetchpriority="high"></div>` : ''}<div class="in"><div class="ey">CHEONAN · 집수리</div><h1>천안 집수리,<br>우리 동네 이름으로 찾으세요</h1>
+<p>무엇을 고칠지, 어느 동네인지 고르면 그 지역에 맞춘 안내가 나와요. 사진을 먼저 보고 가까운 동네 업체와 이어 드려요.</p></div></section>
+${finderBlock()}
+<div class="wrap"><section class="sec rgn" id="regions" style="padding-top:44px"><div class="sec-h"><span class="kick">AREA</span><h2>천안 지역별 집수리</h2><p>구를 고른 뒤 읍·면·동 이름을 누르면 그 동네 기준 안내가 나와요.</p></div>${tabs}<div class="tpanels">${guPanel(idx[0], 0)}${guPanel(idx[1], 1)}${allPanel}</div></section>
+<section class="sec" id="keywords"><div class="sec-h"><span class="kick">FIX</span><h2>천안의 모든 수리 항목</h2><p>작업을 고르면 동네별 안내와 실제 작업 사진을 볼 수 있어요.</p></div>${popularBlock(GROUPS.slice(0, 3), GROUPS.slice(3))}</section>
+<section class="sec" id="shops"><div class="sec-h"><span class="kick">LOCAL PARTNERS</span><h2>우리 동네 업체</h2><p>직접 홍보 페이지를 만든 동네 업체예요. 업체 페이지에서 바로 문의할 수 있어요.</p></div>${vend}
+<div class="sec-h" style="margin:34px 0 0"><h3>동네별 업체 보기</h3><p>동네를 고르면 이사·청소·설치·집수리 업체를 볼 수 있어요.</p></div>${shops}</section>
+${recentBlock()}
+<section class="sec" id="guides"><div class="sec-h"><span class="kick">GUIDE</span><h2>맡기기 전에 읽어 보세요</h2><p>업체 찾는 순서와 견적 비교 기준을 정리했어요.</p></div><div class="grid g2">${GUIDE_LIST.map((x) => `<a class="card" href="${esc(x.path)}"><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><span class="more">읽어 보기</span></a>`).join('')}</div></section>
+${partnerBlock('천안에서 일하시는 사장님께', '홍보 페이지를 만들면 우리 동네 이름으로 노출돼요.')}</div>${TAB_SCRIPT}`;
   const items = [[BRAND, '/'], ['천안 집수리', CITY]];
   const head = `${og(title, desc, ORIGIN + CITY, cardOf(GROUPS[0]))}${verify(env)}<style>${KCSS}</style>${breadcrumbLd(items)}`;
-  return page({ title, desc, body, canonical: ORIGIN + CITY, head, wide: true });
+  const fixbar = `<div class="fixbar"><a class="btn btn-ac" href="${esc(withSrc('/area/cheonan', src))}#inquiry">이 동네 견적 문의하기</a></div>`;
+  return page({ title, desc, body, canonical: ORIGIN + CITY, head, wide: true, fixbar });
 }
+
+const TAB_SCRIPT = `<script>(function(){document.documentElement.classList.add('js');var tl=document.querySelector('[data-tabs]');if(!tl)return;var tabs=[].slice.call(tl.querySelectorAll('[role=tab]')),ps=[].slice.call(document.querySelectorAll('[data-tp]'));
+function sel(i){tabs.forEach(function(t,j){t.setAttribute('aria-selected',j===i?'true':'false');t.tabIndex=j===i?0:-1});ps.forEach(function(p,j){p.hidden=j!==i})}
+tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(i)});t.addEventListener('keydown',function(e){var k=e.key;if(k==='ArrowRight'||k==='ArrowLeft'){var n=(i+(k==='ArrowRight'?1:tabs.length-1))%tabs.length;sel(n);tabs[n].focus();e.preventDefault()}})});
+tl.hidden=false;sel(0);
+document.querySelectorAll('.chipmore').forEach(function(b){b.addEventListener('click',function(){b.closest('[data-tp]').classList.add('open');b.hidden=true})})})();</script>`;
 
 // 사이트맵용 전체 주소
 export function allPaths() {
